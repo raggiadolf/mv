@@ -4,8 +4,9 @@ import { cookies } from "next/headers";
 
 export async function GET(): Promise<Response> {
   const state = generateState();
-  console.log("state", state);
-  const url = await strava.createAuthorizationURL(state);
+  const url = await strava.createAuthorizationURL(state, {
+    scopes: ["read_all,activity:read_all"],
+  });
 
   cookies().set("strava_oauth_state", state, {
     path: "/",
