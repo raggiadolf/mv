@@ -1,14 +1,13 @@
 import { Lucia } from "lucia";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../lib/db";
 import { Strava } from "arctic";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { Session, User } from "lucia";
 import type { User as DbUser } from "@prisma/client";
 
-const client = new PrismaClient();
-const adapter = new PrismaAdapter(client.session, client.user);
+const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
@@ -18,8 +17,7 @@ export const lucia = new Lucia(adapter, {
   },
   getUserAttributes: (attributes) => {
     return {
-      stravaId: attributes.strava_id,
-      firstname: attributes.firstname,
+      ...attributes,
     };
   },
 });

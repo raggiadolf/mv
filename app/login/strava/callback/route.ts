@@ -2,14 +2,11 @@ import { strava, lucia } from "../../../lib/auth";
 import { cookies } from "next/headers";
 import { OAuth2RequestError } from "arctic";
 import { generateId } from "lucia";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../../lib/db";
 
 import type { User } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
 export async function GET(request: Request): Promise<Response> {
-  console.log("here");
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
@@ -31,7 +28,6 @@ export async function GET(request: Request): Promise<Response> {
       }
     );
     const stravaUser: StravaUser = await stravaUserResponse.json();
-    console.log("stravaUser", stravaUser);
     const existingUser = (await prisma.user.findUnique({
       where: {
         strava_id: stravaUser.id,

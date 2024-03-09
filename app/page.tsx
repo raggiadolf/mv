@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { lucia, validateRequest } from "./lib/auth";
 import { cookies } from "next/headers";
+import type { User } from "@prisma/client";
+import Image from "next/image";
 
 export default async function Page() {
   const { user } = await validateRequest();
@@ -16,6 +18,7 @@ export default async function Page() {
           <button>Sign out</button>
         </form>
       </div>
+      <NavBar user={user} />
     </main>
   );
 }
@@ -40,4 +43,20 @@ async function logout(): Promise<ActionResult> {
 
 interface ActionResult {
   error: string | null;
+}
+
+async function NavBar({ user }: { user: User }) {
+  console.log("user", user);
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-md p-4 flex justify-between">
+      <div />
+      <Image
+        className="inline-block rounded-full"
+        width={40}
+        height={40}
+        src={user.profile || ""}
+        alt=""
+      />
+    </nav>
+  );
 }
