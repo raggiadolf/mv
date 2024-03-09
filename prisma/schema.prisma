@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Session {
+  id        String  @id
+  expiresAt DateTime
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model User {
+  id        String    @id
+  strava_id Int       @unique
+  username  String
+  firstname String?
+  lastname  String?
+  profile   String?
+  Session   Session[]
+}
