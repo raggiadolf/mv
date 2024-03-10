@@ -4,6 +4,7 @@ import PolkaDotJersey from "./icons/PolkaDotJersey";
 import YellowJersey from "./icons/YellowJersey";
 import prisma from "./lib/db";
 import { parseISO, format } from "date-fns";
+import Image from "next/image";
 
 export default async function Races() {
   const races = await prisma.race.findMany({
@@ -42,12 +43,13 @@ export default async function Races() {
                 <dt className="sr-only">Participants</dt>
                 {race.Participant.filter((p) => p.jersey).map((p) => (
                   <dd key={p.id} className="relative inline-block">
-                    <img
-                      className="relative inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                    <Image
+                      className="relative inline-block rounded-full ring-2 ring-white"
+                      width={40}
+                      height={40}
                       src={p.User.profile || ""}
                       alt={p.User.firstname || ""}
                     />
-                    {/* <span className="absolute bottom-0 left-0 block h-4 w-4 rounded-full bg-green-400 ring-2 ring-white" /> */}
                     {(() => {
                       switch (p.jersey) {
                         case "YELLOW":
@@ -72,14 +74,6 @@ export default async function Races() {
                     })()}
                   </dd>
                 ))}
-                {/* {race.Participant.map((participant) => {
-                  return (
-                    <div key={participant.id}>
-                      <p>{participant.User.firstname}</p>
-                      <p>{participant.jersey}</p>
-                    </div>
-                  );
-                })} */}
               </div>
             </dl>
           </li>
