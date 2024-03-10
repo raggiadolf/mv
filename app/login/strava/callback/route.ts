@@ -42,6 +42,14 @@ export async function GET(request: Request): Promise<Response> {
         sessionCookie.value,
         sessionCookie.attributes
       );
+      await prisma.user.update({
+        where: {
+          id: existingUser.id,
+        },
+        data: {
+          strava_refresh_token: tokens.refreshToken,
+        },
+      });
       return new Response(null, {
         status: 302,
         headers: {
@@ -59,6 +67,7 @@ export async function GET(request: Request): Promise<Response> {
         firstname: stravaUser.firstname,
         lastname: stravaUser.lastname,
         profile: stravaUser.profile,
+        strava_refresh_token: tokens.refreshToken,
       },
     });
     const session = await lucia.createSession(userId, {});

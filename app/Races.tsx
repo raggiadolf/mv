@@ -21,7 +21,6 @@ export default async function Races() {
       },
     },
   });
-  console.log("races", races);
   return (
     <ul role="list" className="space-y-3">
       {races.map((race) => {
