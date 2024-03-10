@@ -87,6 +87,7 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-02T06:00:00"),
+      title: "Morgunvakt",
     },
   });
   const race2 = await prisma.race.upsert({
@@ -94,6 +95,7 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-09T06:00:00"),
+      title: "Morgunvakt",
     },
   });
   const race3 = await prisma.race.upsert({
@@ -101,6 +103,7 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-16T06:00:00"),
+      title: "Morgunvakt",
     },
   });
   const race4 = await prisma.race.upsert({
@@ -108,6 +111,7 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-23T06:00:00"),
+      title: "Morgunvakt",
     },
   });
   const race5 = await prisma.race.upsert({
@@ -115,6 +119,7 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-30T06:00:00"),
+      title: "Morgunvakt",
     },
   });
 
@@ -124,7 +129,7 @@ async function main() {
     update: {},
     create: {
       user_id: jonG.id,
-      race_id: race1.id,
+      race_id: race5.id,
       jersey: "POLKA",
     },
   });
@@ -133,7 +138,7 @@ async function main() {
     update: {},
     create: {
       user_id: ingvar.id,
-      race_id: race1.id,
+      race_id: race5.id,
       jersey: "YELLOW",
     },
   });
@@ -142,7 +147,7 @@ async function main() {
     update: {},
     create: {
       user_id: oskar.id,
-      race_id: race1.id,
+      race_id: race5.id,
       jersey: "GREEN",
     },
   });
@@ -151,7 +156,7 @@ async function main() {
     update: {},
     create: {
       user_id: thomas.id,
-      race_id: race1.id,
+      race_id: race5.id,
       jersey: "OLD",
     },
   });
@@ -160,7 +165,7 @@ async function main() {
     update: {},
     create: {
       user_id: eyjo.id,
-      race_id: race1.id,
+      race_id: race5.id,
     },
   });
   const participant6 = await prisma.participant.upsert({
@@ -168,7 +173,7 @@ async function main() {
     update: {},
     create: {
       user_id: arnarGauti.id,
-      race_id: race1.id,
+      race_id: race5.id,
     },
   });
 }
