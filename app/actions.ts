@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import prisma from "./lib/db";
 
 export async function updateAttendance(
@@ -8,23 +10,22 @@ export async function updateAttendance(
   raceId: number,
   stravaActivityId?: string
 ) {
-  const res =
-    attendance === "absent"
-      ? await prisma.participant.delete({
-          where: {
-            race_id_user_id: {
-              race_id: raceId,
-              user_id: userId,
-            },
-          },
-        })
-      : await prisma.participant.create({
-          data: {
+  attendance === "absent"
+    ? await prisma.participant.delete({
+        where: {
+          race_id_user_id: {
             race_id: raceId,
             user_id: userId,
-            strava_activity_id: stravaActivityId,
           },
-        });
+        },
+      })
+    : await prisma.participant.create({
+        data: {
+          race_id: raceId,
+          user_id: userId,
+          strava_activity_id: stravaActivityId,
+        },
+      });
 
-  console.log(res);
+  revalidatePath("/races");
 }
