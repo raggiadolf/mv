@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { lucia, validateRequest } from "./lib/auth";
 import { cookies } from "next/headers";
-import { NavBar } from "./Navbar";
+import { NavBar } from "./components/Navbar";
 import Races from "./Races";
 
 export default async function Page() {
@@ -10,7 +10,7 @@ export default async function Page() {
     return redirect("/login");
   }
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between bg-gray-100">
+    <main className="flex min-h-screen flex-col items-center justify-between bg-gray-100 p-2">
       {/* <div className="relative flex place-items-center">
         <h1>Hi, {user.firstname}</h1>
         <p>Your user ID is {user.id}.</p>

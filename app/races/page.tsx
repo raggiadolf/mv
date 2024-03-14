@@ -1,5 +1,5 @@
-import prisma from "./lib/db";
-import RaceCard from "./components/RaceCard";
+import prisma from "../lib/db";
+import RaceCard from "../components/RaceCard";
 
 export default async function Races() {
   const races = await prisma.race.findMany({
