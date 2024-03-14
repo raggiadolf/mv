@@ -1,6 +1,5 @@
 "use client";
 import type { User } from "@prisma/client";
-import Image from "next/image";
 import {
   Navbar,
   NavbarContent,

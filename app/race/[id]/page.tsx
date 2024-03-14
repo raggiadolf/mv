@@ -1,3 +1,5 @@
+import RaceTable from "@/app/components/RaceTable";
+
 export default async function Race({ params }: { params: { id: string } }) {
   const race = await prisma?.race.findUniqueOrThrow({
     where: {
@@ -11,6 +13,6 @@ export default async function Race({ params }: { params: { id: string } }) {
       },
     },
   });
-  console.log("race", race);
-  return <div>{params.id}</div>;
+  if (!race) return null; // TODO: Empty state
+  return <RaceTable race={race} />;
 }

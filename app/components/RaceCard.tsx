@@ -4,12 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import prisma from "../lib/db";
 
-import GreenJersey from "../icons/GreenJersey";
-import OldJersey from "../icons/OldJersey";
-import PolkaDotJersey from "../icons/PolkaDotJersey";
-import YellowJersey from "../icons/YellowJersey";
 import AttendancePill from "./AttendancePill";
 import { validateRequest } from "../lib/auth";
+import { Jersey } from "./Jerseys";
 
 export default async function RaceCard({ id }: { id: number }) {
   const { user } = await validateRequest();
@@ -51,28 +48,10 @@ export default async function RaceCard({ id }: { id: number }) {
                   src={p.User.profile || ""}
                   alt={p.User.firstname || ""}
                 />
-                {(() => {
-                  switch (p.jersey) {
-                    case "YELLOW":
-                      return (
-                        <YellowJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
-                      );
-                    case "GREEN":
-                      return (
-                        <GreenJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
-                      );
-                    case "POLKA":
-                      return (
-                        <PolkaDotJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
-                      );
-                    case "OLD":
-                      return (
-                        <OldJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
-                      );
-                    default:
-                      return null;
-                  }
-                })()}
+                <Jersey
+                  jersey={p.jersey}
+                  className="h-4 w-4 absolute bottom-0 left-0 block"
+                />
               </dd>
             ))}
           </div>
