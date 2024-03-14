@@ -8,7 +8,7 @@ import GreenJersey from "../icons/GreenJersey";
 import OldJersey from "../icons/OldJersey";
 import PolkaDotJersey from "../icons/PolkaDotJersey";
 import YellowJersey from "../icons/YellowJersey";
-import AttendancePill from "./AttendacePill";
+import AttendancePill from "./AttendancePill";
 import { validateRequest } from "../lib/auth";
 
 const jerseyOrder = ["YELLOW", "OLD", "POLKA", "GREEN"];
@@ -35,7 +35,11 @@ export default async function RaceCard({ id }: { id: number }) {
       </Link>
       <div className="flex justify-between">
         {user && (
-          <AttendancePill present={true} userId={user.id} raceId={race.id} />
+          <AttendancePill
+            present={race.Participant.some((p) => p.User.id === user.id)}
+            userId={user.id}
+            raceId={race.id}
+          />
         )}
         <dl className="flex flex-none items-center justify-end">
           <div className="isolate flex overflow-hidden">

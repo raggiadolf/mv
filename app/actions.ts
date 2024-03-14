@@ -8,7 +8,6 @@ export async function updateAttendance(
   raceId: number,
   stravaActivityId?: string
 ) {
-  console.log("attendance", attendance);
   const res =
     attendance === "absent"
       ? await prisma.participant.delete({
