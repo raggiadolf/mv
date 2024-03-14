@@ -11,8 +11,6 @@ import YellowJersey from "../icons/YellowJersey";
 import AttendancePill from "./AttendancePill";
 import { validateRequest } from "../lib/auth";
 
-const jerseyOrder = ["YELLOW", "OLD", "POLKA", "GREEN"];
-
 export default async function RaceCard({ id }: { id: number }) {
   const { user } = await validateRequest();
   const race = await prisma.race.findUniqueOrThrow({
@@ -44,46 +42,39 @@ export default async function RaceCard({ id }: { id: number }) {
         <dl className="flex flex-none items-center justify-end">
           <div className="isolate flex overflow-hidden">
             <dt className="sr-only">Participants</dt>
-            {race.Participant.filter((p) => p.jersey)
-              .sort((a, b) => {
-                return (
-                  jerseyOrder.indexOf(a.jersey || "") -
-                  jerseyOrder.indexOf(b.jersey || "")
-                );
-              })
-              .map((p) => (
-                <dd key={p.id} className="relative inline-block">
-                  <Image
-                    className="relative inline-block rounded-full ring-2 ring-white"
-                    width={35}
-                    height={35}
-                    src={p.User.profile || ""}
-                    alt={p.User.firstname || ""}
-                  />
-                  {(() => {
-                    switch (p.jersey) {
-                      case "YELLOW":
-                        return (
-                          <YellowJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
-                        );
-                      case "GREEN":
-                        return (
-                          <GreenJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
-                        );
-                      case "POLKA":
-                        return (
-                          <PolkaDotJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
-                        );
-                      case "OLD":
-                        return (
-                          <OldJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
-                        );
-                      default:
-                        return null;
-                    }
-                  })()}
-                </dd>
-              ))}
+            {getUsersToDisplay(race.Participant).map((p) => (
+              <dd key={p.id} className="relative inline-block">
+                <Image
+                  className="relative inline-block rounded-full ring-2 ring-white"
+                  width={35}
+                  height={35}
+                  src={p.User.profile || ""}
+                  alt={p.User.firstname || ""}
+                />
+                {(() => {
+                  switch (p.jersey) {
+                    case "YELLOW":
+                      return (
+                        <YellowJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
+                      );
+                    case "GREEN":
+                      return (
+                        <GreenJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
+                      );
+                    case "POLKA":
+                      return (
+                        <PolkaDotJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
+                      );
+                    case "OLD":
+                      return (
+                        <OldJersey className="h-4 w-4 absolute bottom-0 left-0 block" />
+                      );
+                    default:
+                      return null;
+                  }
+                })()}
+              </dd>
+            ))}
           </div>
           <div className="ml-2">
             + {race.Participant.filter((p) => !p.jersey).length}
@@ -100,6 +91,7 @@ function RelativeTime({ date }: { date: Date }) {
     : isYesterday(date)
     ? "Í gær"
     : format(date, "iiii", { locale: is });
+
   return (
     <div className="flex items-center space-x-1 justify-center">
       <p className="text-sm font-semibold text-gray-900">{dayText}</p>
@@ -110,3 +102,18 @@ function RelativeTime({ date }: { date: Date }) {
     </div>
   );
 }
+
+const jerseyOrder = ["YELLOW", "OLD", "POLKA", "GREEN", null];
+const sortByJerseys = (a: any, b: any) => {
+  return jerseyOrder.indexOf(a.jersey) - jerseyOrder.indexOf(b.jersey);
+};
+const getUsersToDisplay = (participants: any) => {
+  const max = 4;
+  const jerseyUsers = participants
+    .filter((p: any) => p.jersey)
+    .sort(sortByJerseys);
+  const fillerUsers = participants
+    .filter((p: any) => !p.jersey)
+    .slice(0, max - jerseyUsers.length);
+  return [...jerseyUsers, ...fillerUsers];
+};

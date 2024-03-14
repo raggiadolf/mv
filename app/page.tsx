@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { lucia, validateRequest } from "./lib/auth";
 import { cookies } from "next/headers";
-import { NavBar } from "./components/Navbar";
-import Races from "./Races";
 
 export default async function Page() {
   const { user } = await validateRequest();
