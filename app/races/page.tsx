@@ -15,7 +15,7 @@ export default async function Races() {
     },
   });
   return (
-    <ul role="list" className="space-y-3 w-full">
+    <ul role="list" className="space-y-3 w-full max-w-[500px]">
       {races.map((race) => {
         return (
           <li key={race.id}>
