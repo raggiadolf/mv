@@ -16,20 +16,17 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
   return (
     <Table isCompact isStriped>
       <TableHeader>
-        <TableColumn>JERSEY</TableColumn>
         <TableColumn>NAME</TableColumn>
       </TableHeader>
       <TableBody emptyContent={"Engir þátttakendur"}>
-        {race.Participant.map((p) => (
+        {race.Participant.sort(sortByJerseys).map((p) => (
           <TableRow key={p.id}>
-            <TableCell>
-              <Jersey jersey={p.jersey} className="h-10 w-10" />
-            </TableCell>
-            <TableCell>
+            <TableCell className="flex items-center">
               <User
                 avatarProps={{ radius: "lg", src: p.User.profile || "" }}
                 name={p.User.firstname}
               />
+              <Jersey jersey={p.jersey} className="ml-2 h-6 w-6" />
             </TableCell>
           </TableRow>
         ))}
@@ -37,3 +34,8 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
     </Table>
   );
 }
+
+const jerseyOrder = ["YELLOW", "OLD", "POLKA", "GREEN", null];
+const sortByJerseys = (a: any, b: any) => {
+  return jerseyOrder.indexOf(a.jersey) - jerseyOrder.indexOf(b.jersey);
+};
