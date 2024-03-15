@@ -48,6 +48,7 @@ model User {
   role                 Role          @default(USER)
   Participant          Participant[]
   Session              Session[]
+  eligible_for_old     Boolean       @default(false)
 }
 
 model SegmentEffort {
