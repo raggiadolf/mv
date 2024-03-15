@@ -142,7 +142,7 @@ async function main() {
       user_id: jonG.id,
       race_id: race5.id,
       jersey: "POLKA",
-      strava_activity_id: "asdf",
+      strava_activity_id: 1234,
     },
   });
   const participant2 = await prisma.participant.upsert({
@@ -152,7 +152,7 @@ async function main() {
       user_id: ingvar.id,
       race_id: race5.id,
       jersey: "YELLOW",
-      strava_activity_id: "asdf",
+      strava_activity_id: 1234,
     },
   });
   const participant3 = await prisma.participant.upsert({
@@ -162,7 +162,7 @@ async function main() {
       user_id: oskar.id,
       race_id: race5.id,
       jersey: "GREEN",
-      strava_activity_id: "asdf",
+      strava_activity_id: 1234,
     },
   });
   const participant4 = await prisma.participant.upsert({
@@ -172,7 +172,7 @@ async function main() {
       user_id: thomas.id,
       race_id: race5.id,
       jersey: "OLD",
-      strava_activity_id: "asdf",
+      strava_activity_id: 1234,
     },
   });
   const participant5 = await prisma.participant.upsert({
@@ -181,7 +181,7 @@ async function main() {
     create: {
       user_id: eyjo.id,
       race_id: race5.id,
-      strava_activity_id: "asdf",
+      strava_activity_id: 1234,
     },
   });
   const participant6 = await prisma.participant.upsert({
@@ -190,7 +190,7 @@ async function main() {
     create: {
       user_id: arnarGauti.id,
       race_id: race5.id,
-      strava_activity_id: "asdf",
+      strava_activity_id: 1234,
     },
   });
 }

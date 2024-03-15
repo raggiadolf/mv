@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "../lib/db";
 import { StravaTokens } from "arctic";
 import { strava } from "../lib/auth";
-import { isFriday } from "date-fns";
+import { isFriday, addSeconds } from "date-fns";
 
 export async function POST(req: Request): Promise<NextResponse> {
   const data = await req.json();
@@ -84,7 +84,11 @@ export async function POST(req: Request): Promise<NextResponse> {
               create: activity.segment_efforts.map((effort: any) => ({
                 strava_segment_id: effort.segment.id,
                 elapsed_time_in_seconds: effort.elapsed_time,
-                start_date_local: effort.start_date_local,
+                start_date: effort.start_date_local,
+                end_date: addSeconds(
+                  effort.start_date_local,
+                  effort.elapsed_time
+                ),
                 is_kom: !!effort.is_kom,
                 average_watts: effort.average_watts,
                 distance_in_meters: effort.distance,

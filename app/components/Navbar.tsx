@@ -41,11 +41,9 @@ export default function NavBar({ user }: { user: User | null }) {
             />
           </DropdownTrigger>
           <DropdownMenu>
-            <DropdownItem>
-              <Link href="/profile">Profile</Link>
-            </DropdownItem>
-            <DropdownItem>
-              <Link href="/logout">Logout</Link>
+            <DropdownItem href="/profile">Profile</DropdownItem>
+            <DropdownItem href={user ? "/logout" : "/login/strava"}>
+              {user ? "Logout" : "Login"}
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>

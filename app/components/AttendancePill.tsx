@@ -17,7 +17,7 @@ export default function AttendancePill({
   present: boolean;
   userId: string;
   raceId: number;
-  stravaActivityId?: string;
+  stravaActivityId?: number;
 }) {
   return (
     <Dropdown>

@@ -54,7 +54,8 @@ model SegmentEffort {
   id                      Int          @id @default(autoincrement())
   strava_segment_id       BigInt
   elapsed_time_in_seconds Int
-  start_date_local        DateTime
+  start_date              DateTime
+  end_date                DateTime
   is_kom                  Boolean
   average_watts           Float
   distance_in_meters      Float
