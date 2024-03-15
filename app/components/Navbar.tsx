@@ -12,7 +12,7 @@ import {
   DropdownTrigger,
 } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
-import classNames from "../utils";
+import classNames from "../lib/utils";
 
 export default function NavBar({ user }: { user: User | null }) {
   const pathname = usePathname();

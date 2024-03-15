@@ -7,6 +7,7 @@ import prisma from "../lib/db";
 import AttendancePill from "./AttendancePill";
 import { validateRequest } from "../lib/auth";
 import { Jersey } from "./Jerseys";
+import { getFormattedDate, getRelativeDayText } from "../lib/utils";
 
 export default async function RaceCard({ id }: { id: number }) {
   const { user } = await validateRequest();
@@ -65,19 +66,14 @@ export default async function RaceCard({ id }: { id: number }) {
 }
 
 function RelativeTime({ date }: { date: Date }) {
-  const dayText = isToday(date)
-    ? "Í dag"
-    : isYesterday(date)
-    ? "Í gær"
-    : format(date, "iiii", { locale: is });
+  const dayText = getRelativeDayText(date);
+  const formattedDate = getFormattedDate(date);
 
   return (
     <div className="flex items-center space-x-1 justify-center">
       <p className="text-sm font-semibold text-gray-900">{dayText}</p>
       <p className="text-gray-600 text-sm">{"\u2022"}</p>
-      <p className="text-sm text-gray-500">
-        {format(date, "d. LLL").toLowerCase()}
-      </p>
+      <p className="text-sm text-gray-500">{formattedDate}</p>
     </div>
   );
 }
