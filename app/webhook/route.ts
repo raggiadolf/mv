@@ -41,7 +41,6 @@ export async function POST(req: Request): Promise<NextResponse> {
       }
     );
     const activity = await res.json();
-    console.log("activity", activity);
     if (
       activity.type === "Ride" &&
       isFriday(new Date(activity.start_date_local)) &&
@@ -94,14 +93,6 @@ export async function POST(req: Request): Promise<NextResponse> {
                 distance_in_meters: effort.distance,
               })),
             },
-            // segment_efforts: activity.segment_efforts.map((effort: any) => ({
-            //   strava_segment_id: effort.segment.id.toString(),
-            //   elapsed_time_in_seconds: effort.elapsed_time,
-            //   starte_date_local: new Date(effort.start_date_local),
-            //   is_kom: effort.is_kom,
-            //   average_watts: effort.average_watts,
-            //   distance_in_meters: effort.distance,
-            // })),
           },
         });
       } catch (e) {
