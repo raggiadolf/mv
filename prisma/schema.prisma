@@ -22,12 +22,10 @@ model Participant {
 }
 
 model Race {
-  id          Int           @id @default(autoincrement())
-  date        DateTime      @db.Timestamptz(6)
-  title       String?
+  id   Int      @id @default(autoincrement())
+  date DateTime @db.Timestamptz(6)
   Participant Participant[]
   race_type   RaceType
-  segment_id  String?
 }
 
 model Session {
@@ -42,9 +40,9 @@ model User {
   strava_id            Int           @unique
   strava_refresh_token String
   username             String
-  firstname             String?
+  firstname            String?
   lastname             String?
-  profile               String?
+  profile              String?
   role                 Role          @default(USER)
   Participant          Participant[]
   Session              Session[]
@@ -65,10 +63,18 @@ model SegmentEffort {
 }
 
 model RaceSegments {
-  id Int @id @default(autoincrement())
+  id                Int     @id @default(autoincrement())
   strava_segment_id BigInt
-  name String?
-  jersey Jersey
+  name              String?
+  jersey            Jersey
+}
+
+model ScheduledRace {
+  id         Int      @id @default(autoincrement())
+  race_type  RaceType
+  weekday    Int
+  start_time String
+  title      String?
 }
 
 enum Jersey {

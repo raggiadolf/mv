@@ -45,6 +45,7 @@ export default function NavBar({ user }: { user: User | null }) {
             <DropdownItem href={user ? "/logout" : "/login/strava"}>
               {user ? "Logout" : "Login"}
             </DropdownItem>
+            <DropdownItem href="/admin/race/create">Create race</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       </NavbarContent>

@@ -1,6 +1,17 @@
 import prisma from "../app/lib/db";
 
 async function main() {
+  // ScheduledRaces
+  const fridayRace = await prisma.scheduledRace.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      race_type: "RACE",
+      weekday: 4,
+      start_time: "06:10",
+      title: "Morgunvakt",
+    },
+  });
   // Users
   const jonG = await prisma.user.upsert({
     where: { strava_id: 1 },
@@ -93,7 +104,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-02T06:00:00"),
-      title: "Morgunvakt",
       race_type: "RACE",
     },
   });
@@ -102,7 +112,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-09T06:00:00"),
-      title: "Morgunvakt",
       race_type: "RACE",
     },
   });
@@ -111,7 +120,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-16T06:00:00"),
-      title: "Morgunvakt",
       race_type: "RACE",
     },
   });
@@ -120,7 +128,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-23T06:00:00"),
-      title: "Morgunvakt",
       race_type: "RACE",
     },
   });
@@ -129,7 +136,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-30T06:00:00"),
-      title: "Morgunvakt",
       race_type: "RACE",
     },
   });

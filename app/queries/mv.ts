@@ -3,6 +3,15 @@ import prisma from "../lib/db";
 import { StravaUser } from "../login/strava/callback/route";
 import { generateId } from "lucia";
 
+// SCHEDULED RACES
+export const getAllScheduledRaces = async () => {
+  return await prisma.scheduledRace.findMany({
+    orderBy: {
+      weekday: "asc",
+    },
+  });
+};
+
 // RACES
 export const getAllRaces = async () => {
   return await prisma.race.findMany({
@@ -49,7 +58,6 @@ export const createDefaultMVRace = async (date: Date) => {
   return await prisma.race.create({
     data: {
       date: new Date(`${date.toISOString().split("T")[0]}T06:10:00`),
-      title: "Morgunvaktin",
       race_type: "RACE",
     },
   });
