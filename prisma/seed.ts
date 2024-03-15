@@ -94,6 +94,7 @@ async function main() {
     create: {
       date: new Date("2023-06-02T06:00:00"),
       title: "Morgunvakt",
+      race_type: "RACE",
     },
   });
   const race2 = await prisma.race.upsert({
@@ -102,6 +103,7 @@ async function main() {
     create: {
       date: new Date("2023-06-09T06:00:00"),
       title: "Morgunvakt",
+      race_type: "RACE",
     },
   });
   const race3 = await prisma.race.upsert({
@@ -110,6 +112,7 @@ async function main() {
     create: {
       date: new Date("2023-06-16T06:00:00"),
       title: "Morgunvakt",
+      race_type: "RACE",
     },
   });
   const race4 = await prisma.race.upsert({
@@ -118,6 +121,7 @@ async function main() {
     create: {
       date: new Date("2023-06-23T06:00:00"),
       title: "Morgunvakt",
+      race_type: "RACE",
     },
   });
   const race5 = await prisma.race.upsert({
@@ -126,6 +130,7 @@ async function main() {
     create: {
       date: new Date("2023-06-30T06:00:00"),
       title: "Morgunvakt",
+      race_type: "RACE",
     },
   });
 

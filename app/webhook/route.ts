@@ -41,6 +41,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       }
     );
     const activity = await res.json();
+    console.log("activity", activity);
     if (
       activity.type === "Ride" &&
       isFriday(new Date(activity.start_date_local)) &&
@@ -50,29 +51,58 @@ export async function POST(req: Request): Promise<NextResponse> {
       // This is probably a MV ride
       let race = await prisma.race.findFirst({
         where: {
-          date: { equals: new Date(activity.start_date_local.split("T")[0]) },
+          date: {
+            gte: new Date(activity.start_date_local.split("T")[0]),
+            lte: new Date(
+              `${activity.start_date_local.split("T")[0]}T23:59:59`
+            ),
+          },
         },
         select: {
           id: true,
         },
       });
       if (!race) {
+        // Create if not available?
         race = await prisma.race.create({
           data: {
             date: new Date(
               `${activity.start_date_local.split("T")[0]}T06:10:00`
             ),
             title: "Morgunvaktin",
+            race_type: "RACE",
           },
         });
       }
-      await prisma.participant.create({
-        data: {
-          user_id: user.id,
-          race_id: race.id,
-          strava_activity_id: activity.id.toString(),
-        },
-      });
+      try {
+        await prisma.participant.create({
+          data: {
+            user_id: user.id,
+            race_id: race.id,
+            strava_activity_id: activity.id,
+            segment_efforts: {
+              create: activity.segment_efforts.map((effort: any) => ({
+                strava_segment_id: effort.segment.id,
+                elapsed_time_in_seconds: effort.elapsed_time,
+                start_date_local: effort.start_date_local,
+                is_kom: !!effort.is_kom,
+                average_watts: effort.average_watts,
+                distance_in_meters: effort.distance,
+              })),
+            },
+            // segment_efforts: activity.segment_efforts.map((effort: any) => ({
+            //   strava_segment_id: effort.segment.id.toString(),
+            //   elapsed_time_in_seconds: effort.elapsed_time,
+            //   starte_date_local: new Date(effort.start_date_local),
+            //   is_kom: effort.is_kom,
+            //   average_watts: effort.average_watts,
+            //   distance_in_meters: effort.distance,
+            // })),
+          },
+        });
+      } catch (e) {
+        console.error("Error creating participant", e);
+      }
     }
   }
   return NextResponse.json({ received: true });

@@ -9,13 +9,14 @@ datasource db {
 }
 
 model Participant {
-  id      Int     @id @default(autoincrement())
-  race_id Int
-  user_id String
-  jersey  Jersey?
-  Race    Race    @relation(fields: [race_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  User    User    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  strava_activity_id String?
+  id                 Int             @id @default(autoincrement())
+  race_id            Int
+  user_id            String
+  jersey             Jersey?
+  Race               Race            @relation(fields: [race_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User               User            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  strava_activity_id BigInt?
+  segment_efforts    SegmentEffort[]
 
   @@unique([race_id, user_id])
 }
@@ -25,6 +26,8 @@ model Race {
   date        DateTime      @db.Timestamptz(6)
   title       String?
   Participant Participant[]
+  race_type   RaceType
+  segment_id  String?
 }
 
 model Session {
@@ -35,16 +38,35 @@ model Session {
 }
 
 model User {
-  id          String        @id
-  strava_id   Int           @unique
+  id                   String        @id
+  strava_id            Int           @unique
   strava_refresh_token String
-  username    String
-  firstname   String?
-  lastname    String?
-  profile     String?
-  role        Role          @default(USER)
-  Participant Participant[]
-  Session     Session[]
+  username             String
+  firstname             String?
+  lastname             String?
+  profile               String?
+  role                 Role          @default(USER)
+  Participant          Participant[]
+  Session              Session[]
+}
+
+model SegmentEffort {
+  id                      Int          @id @default(autoincrement())
+  strava_segment_id       BigInt
+  elapsed_time_in_seconds Int
+  start_date_local        DateTime
+  is_kom                  Boolean
+  average_watts           Float
+  distance_in_meters      Float
+  Participant             Participant? @relation(fields: [participantId], references: [id])
+  participantId           Int?
+}
+
+model RaceSegments {
+  id Int @id @default(autoincrement())
+  strava_segment_id BigInt
+  name String?
+  jersey Jersey
 }
 
 enum Jersey {
@@ -58,4 +80,9 @@ enum Role {
   SUPERADMIN
   ADMIN
   USER
+}
+
+enum RaceType {
+  RACE
+  GROUPRIDE
 }
