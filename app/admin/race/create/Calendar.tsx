@@ -49,7 +49,7 @@ export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
     <div className="w-full px-2">
       <div>
         <div className="flex h-full flex-col">
-          <div className="isolate flex flex-auto flex-col overflow-auto bg-white">
+          <div className="isolate flex flex-auto flex-col bg-white">
             <div
               style={{ width: "165%" }}
               className="flex max-w-full flex-none flex-col sm:max-w-none md:max-w-full"
