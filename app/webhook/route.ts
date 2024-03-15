@@ -42,10 +42,10 @@ export async function POST(req: Request): Promise<NextResponse> {
       new Date(activity.start_date_local).getHours() <= 7
     ) {
       // This is probably a MV ride
-      let race = await findRaceOnDate(activity.start_date_local);
+      let race = await findRaceOnDate(new Date(activity.start_date_local));
       if (!race) {
         // Create if not available?
-        race = await createDefaultMVRace(activity.start_date_local);
+        race = await createDefaultMVRace(new Date(activity.start_date_local));
       }
       try {
         await createParticipantFromStrava(
@@ -59,7 +59,8 @@ export async function POST(req: Request): Promise<NextResponse> {
             is_kom: !!effort.is_kom,
             average_watts: effort.average_watts,
             distance_in_meters: effort.distance,
-          }))
+          })),
+          activity.id
         );
       } catch (e) {
         console.error("Error creating participant", e);
