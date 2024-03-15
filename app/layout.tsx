@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { validateRequest } from "./lib/auth";
 import NavBar from "./components/Navbar";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default async function RootLayout({
           <main className="flex min-h-screen flex-col items-center justify-between bg-gray-100 p-2">
             {children}
             <NavBar user={user} />
+            <SpeedInsights />
           </main>
         </Providers>
       </body>
