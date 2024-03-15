@@ -1,19 +1,8 @@
-import prisma from "../lib/db";
 import RaceCard from "../components/RaceCard";
+import { getAllRaces } from "../queries/mv";
 
 export default async function Races() {
-  const races = await prisma.race.findMany({
-    orderBy: {
-      date: "desc",
-    },
-    include: {
-      Participant: {
-        include: {
-          User: true,
-        },
-      },
-    },
-  });
+  const races = await getAllRaces();
   return (
     <ul role="list" className="space-y-3 w-full max-w-[500px]">
       {races.map((race) => {

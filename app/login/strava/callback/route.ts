@@ -1,10 +1,13 @@
 import { strava, lucia } from "../../../lib/auth";
 import { cookies } from "next/headers";
 import { OAuth2RequestError } from "arctic";
-import { generateId } from "lucia";
-import prisma from "../../../lib/db";
 
 import type { User } from "@prisma/client";
+import {
+  createUser,
+  getUserByStravaId,
+  updateUserStravaRefreshTokenByUserId,
+} from "@/app/queries/mv";
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -28,11 +31,9 @@ export async function GET(request: Request): Promise<Response> {
       }
     );
     const stravaUser: StravaUser = await stravaUserResponse.json();
-    const existingUser = (await prisma.user.findUnique({
-      where: {
-        strava_id: stravaUser.id,
-      },
-    })) as User | undefined;
+    const existingUser = (await getUserByStravaId(stravaUser.id)) as
+      | User
+      | undefined;
 
     if (existingUser) {
       const session = await lucia.createSession(existingUser.id.toString(), {});
@@ -42,14 +43,10 @@ export async function GET(request: Request): Promise<Response> {
         sessionCookie.value,
         sessionCookie.attributes
       );
-      await prisma.user.update({
-        where: {
-          id: existingUser.id,
-        },
-        data: {
-          strava_refresh_token: tokens.refreshToken,
-        },
-      });
+      await updateUserStravaRefreshTokenByUserId(
+        existingUser.id,
+        tokens.refreshToken
+      );
       return new Response(null, {
         status: 302,
         headers: {
@@ -58,18 +55,7 @@ export async function GET(request: Request): Promise<Response> {
       });
     }
 
-    const userId = generateId(15);
-    await prisma.user.create({
-      data: {
-        id: userId,
-        strava_id: stravaUser.id,
-        username: stravaUser.username,
-        firstname: stravaUser.firstname,
-        lastname: stravaUser.lastname,
-        profile: stravaUser.profile,
-        strava_refresh_token: tokens.refreshToken,
-      },
-    });
+    const { id: userId } = await createUser(stravaUser, tokens);
     const session = await lucia.createSession(userId, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
     cookies().set(
@@ -100,7 +86,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 }
 
-interface StravaUser {
+export interface StravaUser {
   id: number;
   username: string;
   firstname: string;

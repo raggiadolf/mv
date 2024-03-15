@@ -1,26 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
-import prisma from "../lib/db";
 
 import AttendancePill from "./AttendancePill";
 import { validateRequest } from "../lib/auth";
 import { Jersey } from "./Jerseys";
 import { getFormattedDate, getRelativeDayText } from "../lib/utils";
+import { getRaceById } from "../queries/mv";
 
 export default async function RaceCard({ id }: { id: number }) {
   const { user } = await validateRequest();
-  const race = await prisma.race.findUniqueOrThrow({
-    where: {
-      id: id,
-    },
-    include: {
-      Participant: {
-        include: {
-          User: true,
-        },
-      },
-    },
-  });
+  const race = await getRaceById(id);
+
+  if (!race) return null;
 
   return (
     <div className="flex flex-col px-4 py-4 bg-white shadow rounded-md space-y-4">
