@@ -4,15 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import type { ScheduledRace } from "@prisma/client";
 import {
   Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
   Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   useDisclosure,
 } from "@nextui-org/react";
 import {
@@ -366,13 +367,34 @@ export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
                     defaultValue={openEvent?.start_time || ""}
                   />
                   <div>
-                    <Button
-                      onPress={onOpen}
-                      color="primary"
-                      startContent={<BlankJersey className="h-10 w-10" />}
-                    >
-                      Velja treyjur
-                    </Button>
+                    <Input
+                      type="text"
+                      label="Treyja & Segment"
+                      placeholder="25885345"
+                      startContent={
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <button>
+                              <BlankJersey className="h-6 w-6" />
+                            </button>
+                          </DropdownTrigger>
+                          <DropdownMenu>
+                            <DropdownItem>
+                              <YellowJersey className="h-6 w-6" />
+                            </DropdownItem>
+                            <DropdownItem>
+                              <OldJersey className="h-6 w-6" />
+                            </DropdownItem>
+                            <DropdownItem>
+                              <GreenJersey className="h-6 w-6" />
+                            </DropdownItem>
+                            <DropdownItem>
+                              <PolkaDotJersey className="h-6 w-6" />
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      }
+                    />
                   </div>
                 </div>
               </ModalBody>

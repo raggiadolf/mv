@@ -22,8 +22,8 @@ model Participant {
 }
 
 model Race {
-  id   Int      @id @default(autoincrement())
-  date DateTime @db.Timestamptz(6)
+  id          Int           @id @default(autoincrement())
+  date        DateTime      @db.Timestamptz(6)
   Participant Participant[]
   race_type   RaceType
 }
@@ -63,18 +63,21 @@ model SegmentEffort {
 }
 
 model RaceSegments {
-  id                Int     @id @default(autoincrement())
+  id                Int            @id @default(autoincrement())
   strava_segment_id BigInt
   name              String?
   jersey            Jersey
+  ScheduledRace     ScheduledRace? @relation(fields: [scheduledRaceId], references: [id])
+  scheduledRaceId   Int?
 }
 
 model ScheduledRace {
-  id         Int      @id @default(autoincrement())
+  id         Int            @id @default(autoincrement())
   race_type  RaceType
   weekday    Int
   start_time String
   title      String?
+  segments   RaceSegments[]
 }
 
 enum Jersey {
