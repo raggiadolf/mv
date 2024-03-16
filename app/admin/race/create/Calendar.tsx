@@ -2,13 +2,43 @@
 import classNames from "@/app/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import type { ScheduledRace } from "@prisma/client";
+import {
+  Button,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  useDisclosure,
+} from "@nextui-org/react";
+import {
+  BlankJersey,
+  GreenJersey,
+  OldJersey,
+  PolkaDotJersey,
+  YellowJersey,
+} from "@/app/components/Jerseys";
 
 const weekDays = ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"];
 
 export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
-  const container = useRef<HTMLOListElement>(null);
+  const container = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [weekDay, setWeekDay] = useState(5);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [openEvent, setOpenEvent] = useState<{
+    title: string;
+    start_time: string;
+    jerseys: {
+      key: "YELLOW" | "GREEN" | "POLKA" | "OLD";
+      strava_id: number;
+    }[];
+  } | null>(null);
+  console.log("openEvent", openEvent);
 
   useEffect(() => {
     if (container.current) {
@@ -272,7 +302,7 @@ export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
                   </div>
 
                   {/* Events */}
-                  <ol
+                  <div
                     className="col-start-1 col-end-2 row-start-1 grid grid-cols-1 sm:grid-cols-7 sm:pr-8"
                     style={{
                       gridTemplateRows:
@@ -282,33 +312,82 @@ export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
                     ref={container}
                   >
                     {scheduleWithCalendarSlots.map((s) => (
-                      <li
+                      <div
+                        onClick={() => {
+                          setOpenEvent({
+                            title: s.title || "",
+                            start_time: s.start_time,
+                            jerseys: [],
+                          });
+                          onOpen();
+                        }}
                         key={s.id}
-                        className={`relative mt-px flex sm:col-start-${s.daySlot}`}
+                        className={`relative mt-px flex col-start-${s.daySlot}`}
                         style={{
                           gridRow: `${s.timeStart} / span 12`,
                         }}
                       >
-                        <a
-                          href="#"
-                          className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs leading-5 hover:bg-blue-100"
-                        >
+                        <div className="cursor-pointer group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs leading-5 hover:bg-blue-100">
                           <p className="order-1 font-semibold text-blue-700">
                             {s.title}
                           </p>
                           <p className="text-blue-500 group-hover:text-blue-700">
                             <time dateTime={s.start_time}>{s.start_time}</time>
                           </p>
-                        </a>
-                      </li>
+                        </div>
+                      </div>
                     ))}
-                  </ol>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <Modal isOpen={isOpen} onClose={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Breyta viðburði
+              </ModalHeader>
+              <ModalBody>
+                <div className="flex flex-col space-y-4 p-2">
+                  <Input
+                    type="text"
+                    label="Titill"
+                    placeholder="Morgunvaktin"
+                    defaultValue={openEvent?.title || ""}
+                  />
+                  <Input
+                    type="text"
+                    label="Rástími"
+                    placeholder="06:10"
+                    defaultValue={openEvent?.start_time || ""}
+                  />
+                  <div>
+                    <Button
+                      onPress={onOpen}
+                      color="primary"
+                      startContent={<BlankJersey className="h-10 w-10" />}
+                    >
+                      Velja treyjur
+                    </Button>
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="primary" onPress={onClose}>
+                  Vista
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
