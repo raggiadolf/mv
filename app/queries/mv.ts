@@ -18,6 +18,7 @@ export const getAllScheduledRaces = async () => {
 
 export const updateScheduledRace = async (
   id: number,
+  title: string,
   weekday: number,
   time: string,
   raceSegments: {
@@ -30,6 +31,7 @@ export const updateScheduledRace = async (
       id: id,
     },
     data: {
+      title: title,
       weekday: weekday,
       start_time: time,
       RaceSegment: {

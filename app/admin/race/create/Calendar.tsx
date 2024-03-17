@@ -16,6 +16,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { Jersey } from "@/app/components/Jerseys";
+import { updateScheduled } from "@/app/actions";
 
 const weekDays = ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"];
 
@@ -29,7 +30,9 @@ export default function Calendar({
   const [weekDay, setWeekDay] = useState(5);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [openEvent, setOpenEvent] = useState<{
+    id: number;
     title: string;
+    weekday: number;
     start_time: string;
     jerseys: {
       key: "YELLOW" | "GREEN" | "POLKA" | "OLD";
@@ -313,8 +316,10 @@ export default function Calendar({
                       <div
                         onClick={() => {
                           setOpenEvent({
+                            id: s.id,
                             title: s.title || "",
                             start_time: s.start_time,
+                            weekday: s.weekday,
                             jerseys: s.RaceSegment.map((r) => ({
                               key: r.jersey,
                               strava_id: Number(r.strava_segment_id),
@@ -358,13 +363,25 @@ export default function Calendar({
                     type="text"
                     label="Titill"
                     placeholder="Morgunvaktin"
-                    defaultValue={openEvent?.title || ""}
+                    value={openEvent?.title || ""}
+                    onChange={(e) => {
+                      setOpenEvent({
+                        ...openEvent!,
+                        title: e.target.value,
+                      });
+                    }}
                   />
                   <Input
                     type="text"
                     label="Rástími"
                     placeholder="06:10"
-                    defaultValue={openEvent?.start_time || ""}
+                    value={openEvent?.start_time || ""}
+                    onChange={(e) => {
+                      setOpenEvent({
+                        ...openEvent!,
+                        start_time: e.target.value,
+                      });
+                    }}
                   />
                   <div className="flex flex-col">
                     <CheckboxGroup
@@ -493,9 +510,24 @@ export default function Calendar({
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
-                  Close
+                  Loka
                 </Button>
-                <Button color="primary" onPress={onClose}>
+                <Button
+                  color="primary"
+                  onPress={() => {
+                    updateScheduled(
+                      openEvent!.id,
+                      openEvent!.title,
+                      openEvent!.weekday,
+                      openEvent!.start_time,
+                      openEvent!.jerseys.map((j) => ({
+                        strava_segment_id: j.strava_id || 0,
+                        jersey: j.key,
+                      }))
+                    );
+                    onClose();
+                  }}
+                >
                   Vista
                 </Button>
               </ModalFooter>

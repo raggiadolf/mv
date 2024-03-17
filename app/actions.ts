@@ -5,7 +5,12 @@ import { revalidatePath } from "next/cache";
 import { lucia, validateRequest } from "./lib/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createParticipant, deleteParticipant } from "./queries/mv";
+import {
+  createParticipant,
+  deleteParticipant,
+  updateScheduledRace,
+} from "./queries/mv";
+import { Jersey } from "@prisma/client";
 
 export async function updateAttendance(
   attendance: "present" | "absent",
@@ -36,6 +41,21 @@ export async function logout(): Promise<ActionResult> {
     sessionCookie.attributes
   );
   return redirect("/login");
+}
+
+export async function updateScheduled(
+  raceId: number,
+  title: string,
+  weekday: number,
+  time: string,
+  raceSegments: {
+    strava_segment_id: number;
+    jersey: Jersey;
+  }[]
+) {
+  "use server";
+  await updateScheduledRace(raceId, title, weekday, time, raceSegments);
+  revalidatePath("/race/create");
 }
 
 interface ActionResult {
