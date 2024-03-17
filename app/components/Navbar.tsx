@@ -65,7 +65,7 @@ export default function NavBar({ user }: { user: User | null }) {
             <NextUIUser
               as="button"
               className="transition-transform"
-              name={user?.firstname || ""}
+              name=""
               avatarProps={{ src: user?.profile || "", size: "md" }}
             />
           </DropdownTrigger>
