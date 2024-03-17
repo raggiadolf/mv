@@ -2,12 +2,39 @@ import { StravaTokens } from "arctic";
 import prisma from "../lib/db";
 import { StravaUser } from "../login/strava/callback/route";
 import { generateId } from "lucia";
+import { Jersey } from "@prisma/client";
 
 // SCHEDULED RACES
 export const getAllScheduledRaces = async () => {
   return await prisma.scheduledRace.findMany({
     orderBy: {
       weekday: "asc",
+    },
+    include: {
+      RaceSegment: true,
+    },
+  });
+};
+
+export const updateScheduledRace = async (
+  id: number,
+  weekday: number,
+  time: string,
+  raceSegments: {
+    strava_segment_id: number;
+    jersey: Jersey;
+  }[]
+) => {
+  return await prisma.scheduledRace.update({
+    where: {
+      id: id,
+    },
+    data: {
+      weekday: weekday,
+      start_time: time,
+      RaceSegment: {
+        create: raceSegments,
+      },
     },
   });
 };

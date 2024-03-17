@@ -4,25 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import type { ScheduledRace } from "@prisma/client";
 import {
   Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
+  CheckboxGroup,
   Input,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
+  VisuallyHidden,
+  useCheckbox,
   useDisclosure,
 } from "@nextui-org/react";
-import {
-  BlankJersey,
-  GreenJersey,
-  OldJersey,
-  PolkaDotJersey,
-  YellowJersey,
-} from "@/app/components/Jerseys";
+import { Jersey } from "@/app/components/Jerseys";
 
 const weekDays = ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"];
 
@@ -36,7 +29,7 @@ export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
     start_time: string;
     jerseys: {
       key: "YELLOW" | "GREEN" | "POLKA" | "OLD";
-      strava_id: number;
+      strava_id: number | null;
     }[];
   } | null>(null);
   console.log("openEvent", openEvent);
@@ -366,35 +359,128 @@ export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
                     placeholder="06:10"
                     defaultValue={openEvent?.start_time || ""}
                   />
-                  <div>
-                    <Input
-                      type="text"
-                      label="Treyja & Segment"
-                      placeholder="25885345"
-                      startContent={
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <button>
-                              <BlankJersey className="h-6 w-6" />
-                            </button>
-                          </DropdownTrigger>
-                          <DropdownMenu>
-                            <DropdownItem>
-                              <YellowJersey className="h-6 w-6" />
-                            </DropdownItem>
-                            <DropdownItem>
-                              <OldJersey className="h-6 w-6" />
-                            </DropdownItem>
-                            <DropdownItem>
-                              <GreenJersey className="h-6 w-6" />
-                            </DropdownItem>
-                            <DropdownItem>
-                              <PolkaDotJersey className="h-6 w-6" />
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
-                      }
-                    />
+                  <div className="flex flex-col">
+                    <CheckboxGroup
+                      className="gap-1"
+                      orientation="vertical"
+                      value={openEvent?.jerseys.map((j) => j.key) || []}
+                      onChange={(e) => {
+                        if (typeof (e as string[]).map === "function") {
+                          setOpenEvent({
+                            ...openEvent!,
+                            jerseys: (e as string[]).map((key) => ({
+                              key: key as "YELLOW" | "GREEN" | "POLKA" | "OLD",
+                              strava_id: null,
+                            })),
+                          });
+                        }
+                      }}
+                    >
+                      <div className="flex">
+                        <CustomCheckbox value="YELLOW" jersey="YELLOW" />
+                        <Input
+                          isDisabled={
+                            !openEvent?.jerseys.find((j) => j.key === "YELLOW")
+                          }
+                          label="Strava ID"
+                          placeholder="12345678"
+                          value={
+                            openEvent?.jerseys
+                              .find((j) => j.key === "YELLOW")
+                              ?.strava_id?.toString() || ""
+                          }
+                          onValueChange={(e: string) => {
+                            setOpenEvent({
+                              ...openEvent!,
+                              jerseys:
+                                openEvent?.jerseys.map((j) =>
+                                  j.key === "YELLOW"
+                                    ? { ...j, strava_id: parseInt(e) }
+                                    : j
+                                ) || [],
+                            });
+                          }}
+                        />
+                      </div>
+                      <div className="flex">
+                        <CustomCheckbox value="OLD" jersey="OLD" />
+                        <Input
+                          isDisabled={
+                            !openEvent?.jerseys.find((j) => j.key === "OLD")
+                          }
+                          label="Strava ID"
+                          placeholder="12345678"
+                          value={
+                            openEvent?.jerseys
+                              .find((j) => j.key === "OLD")
+                              ?.strava_id?.toString() || ""
+                          }
+                          onValueChange={(e: string) => {
+                            setOpenEvent({
+                              ...openEvent!,
+                              jerseys:
+                                openEvent?.jerseys.map((j) =>
+                                  j.key === "OLD"
+                                    ? { ...j, strava_id: parseInt(e) }
+                                    : j
+                                ) || [],
+                            });
+                          }}
+                        />
+                      </div>
+                      <div className="flex">
+                        <CustomCheckbox value="GREEN" jersey="GREEN" />
+                        <Input
+                          isDisabled={
+                            !openEvent?.jerseys.find((j) => j.key === "GREEN")
+                          }
+                          label="Strava ID"
+                          placeholder="12345678"
+                          value={
+                            openEvent?.jerseys
+                              .find((j) => j.key === "GREEN")
+                              ?.strava_id?.toString() || ""
+                          }
+                          onValueChange={(e: string) => {
+                            setOpenEvent({
+                              ...openEvent!,
+                              jerseys:
+                                openEvent?.jerseys.map((j) =>
+                                  j.key === "GREEN"
+                                    ? { ...j, strava_id: parseInt(e) }
+                                    : j
+                                ) || [],
+                            });
+                          }}
+                        />
+                      </div>
+                      <div className="flex">
+                        <CustomCheckbox value="POLKA" jersey="POLKA" />
+                        <Input
+                          isDisabled={
+                            !openEvent?.jerseys.find((j) => j.key === "POLKA")
+                          }
+                          label="Strava ID"
+                          placeholder="12345678"
+                          value={
+                            openEvent?.jerseys
+                              .find((j) => j.key === "POLKA")
+                              ?.strava_id?.toString() || ""
+                          }
+                          onValueChange={(e: string) => {
+                            setOpenEvent({
+                              ...openEvent!,
+                              jerseys:
+                                openEvent?.jerseys.map((j) =>
+                                  j.key === "POLKA"
+                                    ? { ...j, strava_id: parseInt(e) }
+                                    : j
+                                ) || [],
+                            });
+                          }}
+                        />
+                      </div>
+                    </CheckboxGroup>
                   </div>
                 </div>
               </ModalBody>
@@ -413,3 +499,24 @@ export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
     </div>
   );
 }
+
+const CustomCheckbox = (props: any) => {
+  const { isSelected, getBaseProps, getInputProps } = useCheckbox({
+    ...props,
+  });
+
+  return (
+    <label {...getBaseProps()}>
+      <VisuallyHidden>
+        <input {...getInputProps()} />
+      </VisuallyHidden>
+      <Jersey
+        jersey={props.jersey as "YELLOW" | "GREEN" | "POLKA" | "OLD" | null}
+        className={classNames(
+          "w-8 h-8",
+          isSelected ? "opacity-100" : "opacity-25"
+        )}
+      />
+    </label>
+  );
+};

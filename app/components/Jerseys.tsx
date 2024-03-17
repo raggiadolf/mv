@@ -21,6 +21,15 @@ export function Jersey({
   })();
 }
 
+export function getAllJerseyIcons({ className }: { className?: string }) {
+  return [
+    <YellowJersey key="YELLOW" className={className} />,
+    <OldJersey key="OLD" className={className} />,
+    <GreenJersey key="GREEN" className={className} />,
+    <PolkaDotJersey key="POLKA" className={className} />,
+  ];
+}
+
 export function GreenJersey({ className }: { className?: string }) {
   return (
     <svg

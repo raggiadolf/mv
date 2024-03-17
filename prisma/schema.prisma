@@ -62,7 +62,7 @@ model SegmentEffort {
   participantId           Int?
 }
 
-model RaceSegments {
+model RaceSegment {
   id                Int            @id @default(autoincrement())
   strava_segment_id BigInt
   name              String?
@@ -77,7 +77,7 @@ model ScheduledRace {
   weekday    Int
   start_time String
   title      String?
-  segments   RaceSegments[]
+  RaceSegment   RaceSegment[]
 }
 
 enum Jersey {
