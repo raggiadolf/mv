@@ -5,11 +5,11 @@ import {
   NavbarContent,
   NavbarItem,
   Link,
-  Avatar,
   Dropdown,
   DropdownMenu,
   DropdownItem,
   DropdownTrigger,
+  User as NextUIUser,
 } from "@nextui-org/react";
 import { usePathname } from "next/navigation";
 import classNames from "../lib/utils";
@@ -57,13 +57,11 @@ export default function NavBar({ user }: { user: User | null }) {
         </NavbarItem>
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
-            <Avatar
-              isBordered
+            <NextUIUser
               as="button"
               className="transition-transform"
               name={user?.firstname || ""}
-              size="sm"
-              src={user?.profile || ""}
+              avatarProps={{ src: user?.profile || "", size: "md" }}
             />
           </DropdownTrigger>
           <DropdownMenu>{getDropdownItems()}</DropdownMenu>
