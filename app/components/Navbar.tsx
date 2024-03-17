@@ -20,20 +20,25 @@ export default function NavBar({ user }: { user: User | null }) {
       <DropdownItem
         key={user ? "logout" : "login"}
         href={user ? "/logout" : "/login/strava"}
+        aria-label={user ? "Logout" : "Login with Strava"}
       >
         {user ? "Logout" : <StravaIcon />}
       </DropdownItem>,
     ];
     if (user) {
       items.push(
-        <DropdownItem key="profile" href="/profile">
+        <DropdownItem key="profile" href="/profile" aria-label="Prófíll">
           Prófill
         </DropdownItem>
       );
     }
     if (user?.role === "ADMIN") {
       items.push(
-        <DropdownItem key="create-race" href="/admin/race/create">
+        <DropdownItem
+          key="create-race"
+          href="/admin/race/create"
+          aria-label="Admin viðburðir"
+        >
           Búa til viðburð
         </DropdownItem>
       );
@@ -45,12 +50,12 @@ export default function NavBar({ user }: { user: User | null }) {
   return (
     <Navbar className="sticky bottom-0">
       <NavbarContent justify="center" className="w-full space-x-16">
-        <NavbarItem>
+        <NavbarItem aria-label="races">
           <Link href="/races">
             <CalendarIcon isActive={pathname === "/races"} />
           </Link>
         </NavbarItem>
-        <NavbarItem>
+        <NavbarItem aria-label="leaderboard">
           <Link href="/leaderboard">
             <TrophyIcon isActive={pathname === "/leaderboard"} />
           </Link>
@@ -131,7 +136,7 @@ function StravaIcon() {
       <g
         id="Strava-Button_outlined"
         stroke="none"
-        stroke-width="1"
+        strokeWidth="1"
         fill="none"
         fillRule="evenodd"
       >

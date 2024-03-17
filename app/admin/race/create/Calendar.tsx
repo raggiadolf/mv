@@ -416,6 +416,7 @@ export default function Calendar({
                     <DropdownMenu>
                       {weekDaysLong.map((day, index) => (
                         <DropdownItem
+                          textValue={day}
                           key={index}
                           onClick={() => {
                             setOpenEvent({
