@@ -2,24 +2,36 @@
 import { Tabs, Tab } from "@nextui-org/react";
 import { Jersey } from "../components/Jerseys";
 import LeaderboardTable from "./LeaderboardTable";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+async function getResults(jersey: string) {
+  return await fetch(`/results?jersey=${jersey}`).then((res) => res.json());
+}
 
 export default function Leaderboard() {
   const [selectedTab, setSelectedTab] = useState<React.Key>("YELLOW");
-  const [results, setResults] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
   const tabs = ["YELLOW", "OLD", "GREEN", "POLKA"];
 
-  useEffect(() => {
-    setIsLoading(true);
-    fetch(`/results?jersey=${selectedTab}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setResults(data);
-        setIsLoading(false);
-      });
-  }, [selectedTab]);
+  const { data, isFetching } = useQuery<
+    {
+      firstname: string;
+      lastname: string;
+      strava_id: number;
+      profile: string;
+      Participant: {
+        race_id: number;
+        strava_activity_id: number;
+        Race: {
+          date: string;
+        };
+      }[];
+      _count: { Participant: number };
+    }[]
+  >({
+    queryKey: ["results", selectedTab],
+    queryFn: () => getResults(selectedTab as string),
+  });
 
   return (
     <div className="flex w-full flex-col">
@@ -45,10 +57,10 @@ export default function Leaderboard() {
               />
             }
           >
-            {isLoading ? (
-              <p>Loading...</p>
+            {isFetching ? (
+              <p>Sæki niðurstöður...</p>
             ) : (
-              <LeaderboardTable participants={results} />
+              <LeaderboardTable participants={data || []} />
             )}
           </Tab>
         ))}
