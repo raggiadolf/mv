@@ -19,11 +19,13 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
       <DateHeader date={race.date} />
       <Table isCompact isStriped>
         <TableHeader>
+          <TableColumn>Sæti</TableColumn>
           <TableColumn>Nafn</TableColumn>
         </TableHeader>
         <TableBody emptyContent={"Engir þátttakendur"}>
-          {race.Participant.sort(sortByJerseys).map((p) => (
+          {race.Participant.sort(sortByJerseys).map((p, i) => (
             <TableRow key={p.id}>
+              <TableCell>{i + 1}</TableCell>
               <TableCell className="flex items-center">
                 <User
                   avatarProps={{ radius: "lg", src: p.User.profile || "" }}

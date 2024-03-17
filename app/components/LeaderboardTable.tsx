@@ -32,7 +32,7 @@ export default function LeaderboardTable({
   return (
     <Table>
       <TableHeader>
-        <TableColumn>Pos</TableColumn>
+        <TableColumn>Sæti</TableColumn>
         <TableColumn>Nafn</TableColumn>
         <TableColumn>Síðasta treyja</TableColumn>
         <TableColumn>Fjöldi</TableColumn>
