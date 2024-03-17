@@ -3,6 +3,7 @@ import prisma from "../lib/db";
 import { StravaUser } from "../login/strava/callback/route";
 import { generateId } from "lucia";
 import { Jersey } from "@prisma/client";
+import { getHours, getISODay, getMinutes } from "date-fns";
 
 // SCHEDULED RACES
 export const getAllScheduledRaces = async () => {
@@ -77,11 +78,22 @@ export const deleteScheduledRace = async (id: number) => {
 };
 
 export const getScheduledRaceForRaceTime = async (date: Date) => {
-  return await prisma.scheduledRace.findFirst({
+  const zeroBasedISODay = getISODay(date) - 1;
+  const startHourOfRide = getHours(date);
+  const race = await prisma.scheduledRace.findFirst({
     where: {
-      weekday: date.getDay(),
+      weekday: zeroBasedISODay,
+      start_hour: {
+        lte: startHourOfRide + 2,
+        gte: startHourOfRide - 1,
+      },
+    },
+    include: {
+      RaceSegment: true,
     },
   });
+
+  return race;
 };
 
 // RACES
@@ -148,6 +160,7 @@ export const createParticipantFromStrava = async (
     is_kom: boolean;
     average_watts: number;
     distance_in_meters: number;
+    race_segment_id: number;
   }[],
   stravaActivityId?: number
 ) => {

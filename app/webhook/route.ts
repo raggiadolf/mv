@@ -6,6 +6,7 @@ import {
   createDefaultMVRace,
   createParticipantFromStrava,
   findRaceOnDate,
+  getScheduledRaceForRaceTime,
   getUserByStravaId,
   updateUserStravaRefreshtokenByStravaId,
 } from "../queries/mv";
@@ -35,33 +36,37 @@ export async function POST(req: Request): Promise<NextResponse> {
       }
     );
     const activity = await res.json();
-    if (
-      activity.type === "Ride" &&
-      isFriday(new Date(activity.start_date_local)) &&
-      new Date(activity.start_date_local).getHours() >= 5 &&
-      new Date(activity.start_date_local).getHours() <= 7
-    ) {
-      // This is probably a MV ride
+    const scheduledRace = await getScheduledRaceForRaceTime(
+      new Date(activity.start_date_local)
+    );
+    if (activity.type === "Ride" && scheduledRace) {
+      // This lands within a scheduled race timeframe
       let race = await findRaceOnDate(new Date(activity.start_date_local));
       if (!race) {
         // Create if not available?
         race = await createDefaultMVRace(new Date(activity.start_date_local));
       }
+      const activityRaceSegments = activity.segment_efforts.filter((se: any) =>
+        scheduledRace.RaceSegment.map((rs: any) =>
+          Number(rs.strava_segment_id)
+        ).includes(se.segment.id)
+      );
+      console.log("activityRaceSegments", activityRaceSegments);
       try {
-        await createParticipantFromStrava(
-          user.id,
-          race.id,
-          activity.segment_efforts.map((effort: any) => ({
-            strava_segment_id: effort.segment.id,
-            elapsed_time_in_seconds: effort.elapsed_time,
-            start_date: effort.start_date_local,
-            end_date: addSeconds(effort.start_date_local, effort.elapsed_time),
-            is_kom: !!effort.is_kom,
-            average_watts: effort.average_watts,
-            distance_in_meters: effort.distance,
-          })),
-          activity.id
-        );
+        // await createParticipantFromStrava(
+        //   user.id,
+        //   race.id,
+        //   activity.segment_efforts.map((effort: any) => ({
+        //     strava_segment_id: effort.segment.id,
+        //     elapsed_time_in_seconds: effort.elapsed_time,
+        //     start_date: effort.start_date_local,
+        //     end_date: addSeconds(effort.start_date_local, effort.elapsed_time),
+        //     is_kom: !!effort.is_kom,
+        //     average_watts: effort.average_watts,
+        //     distance_in_meters: effort.distance,
+        //   })),
+        //   activity.id
+        // );
       } catch (e) {
         console.error("Error creating participant", e);
       }

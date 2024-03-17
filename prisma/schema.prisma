@@ -63,26 +63,29 @@ model SegmentEffort {
   distance_in_meters      Float
   Participant             Participant? @relation(fields: [participantId], references: [id])
   participantId           Int?
+  RaceSegment             RaceSegment  @relation(fields: [raceSegmentId], references: [id])
+  raceSegmentId           Int
 }
 
 model RaceSegment {
-  id                Int            @id @default(autoincrement())
+  id                Int             @id @default(autoincrement())
   strava_segment_id BigInt
   name              String?
   jersey            Jersey
-  ScheduledRace     ScheduledRace? @relation(fields: [scheduledRaceId], references: [id])
+  ScheduledRace     ScheduledRace?  @relation(fields: [scheduledRaceId], references: [id])
   scheduledRaceId   Int?
+  SegmentEffort     SegmentEffort[]
 }
 
 model ScheduledRace {
-  id          Int           @id @default(autoincrement())
-  race_type   RaceType
-  weekday     Int
-  start_hour  Int
+  id           Int           @id @default(autoincrement())
+  race_type    RaceType
+  weekday      Int
+  start_hour   Int
   start_minute Int
-  title       String?
-  RaceSegment RaceSegment[]
-  Race        Race[]
+  title        String?
+  RaceSegment  RaceSegment[]
+  Race         Race[]
 }
 
 enum Jersey {
