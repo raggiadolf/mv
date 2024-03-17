@@ -35,6 +35,7 @@ export const updateScheduledRace = async (
       weekday: weekday,
       start_time: time,
       RaceSegment: {
+        deleteMany: {},
         create: raceSegments,
       },
     },
