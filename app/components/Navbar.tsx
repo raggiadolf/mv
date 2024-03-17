@@ -21,19 +21,20 @@ export default function NavBar({ user }: { user: User | null }) {
         key={user ? "logout" : "login"}
         href={user ? "/logout" : "/login/strava"}
         aria-label={user ? "Logout" : "Login with Strava"}
+        className="text-danger"
       >
         {user ? "Logout" : <StravaIcon />}
       </DropdownItem>,
     ];
     if (user) {
-      items.push(
+      items.unshift(
         <DropdownItem key="profile" href="/profile" aria-label="Prófíll">
           Prófill
         </DropdownItem>
       );
     }
     if (user?.role === "ADMIN") {
-      items.push(
+      items.unshift(
         <DropdownItem
           key="create-race"
           href="/admin/race/create"

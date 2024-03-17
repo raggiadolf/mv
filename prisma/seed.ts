@@ -12,6 +12,15 @@ async function main() {
       title: "Morgunvakt",
     },
   });
+  const fridaySegment = await prisma.raceSegment.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      strava_segment_id: 28414406,
+      jersey: "YELLOW",
+      scheduledRaceId: fridayRace.id,
+    },
+  });
   // Users
   const jonG = await prisma.user.upsert({
     where: { strava_id: 1 },
