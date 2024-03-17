@@ -1,7 +1,7 @@
 "use client";
 import classNames from "@/app/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import type { ScheduledRace } from "@prisma/client";
+import type { ScheduledRaceWithSegments } from "@/app/lib/db";
 import {
   Button,
   CheckboxGroup,
@@ -19,7 +19,11 @@ import { Jersey } from "@/app/components/Jerseys";
 
 const weekDays = ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"];
 
-export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
+export default function Calendar({
+  schedule,
+}: {
+  schedule: ScheduledRaceWithSegments[];
+}) {
   const container = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [weekDay, setWeekDay] = useState(5);
@@ -311,7 +315,10 @@ export default function Calendar({ schedule }: { schedule: ScheduledRace[] }) {
                           setOpenEvent({
                             title: s.title || "",
                             start_time: s.start_time,
-                            jerseys: [],
+                            jerseys: s.RaceSegment.map((r) => ({
+                              key: r.jersey,
+                              strava_id: Number(r.strava_segment_id),
+                            })),
                           });
                           onOpen();
                         }}

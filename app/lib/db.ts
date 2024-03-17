@@ -24,3 +24,9 @@ export type RaceWithParticipants = Prisma.RaceGetPayload<{
     };
   };
 }>;
+
+export type ScheduledRaceWithSegments = Prisma.ScheduledRaceGetPayload<{
+  include: {
+    RaceSegment: true;
+  };
+}>;
