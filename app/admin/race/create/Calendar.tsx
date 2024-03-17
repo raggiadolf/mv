@@ -394,7 +394,9 @@ export default function Calendar({
                             ...openEvent!,
                             jerseys: (e as string[]).map((key) => ({
                               key: key as "YELLOW" | "GREEN" | "POLKA" | "OLD",
-                              strava_id: null,
+                              strava_id:
+                                openEvent!.jerseys.find((j) => j.key === key)
+                                  ?.strava_id || null,
                             })),
                           });
                         }
