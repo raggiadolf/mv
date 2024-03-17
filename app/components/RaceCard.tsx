@@ -19,12 +19,14 @@ export default async function RaceCard({ id }: { id: number }) {
         <RelativeTime date={race.date} />
       </Link>
       <div className="flex justify-between">
-        {user && (
+        {user ? (
           <AttendancePill
             present={race.Participant.some((p) => p.User.id === user.id)}
             userId={user.id}
             raceId={race.id}
           />
+        ) : (
+          <div />
         )}
         <dl className="flex flex-none items-center justify-end">
           <div className="isolate flex overflow-hidden">
