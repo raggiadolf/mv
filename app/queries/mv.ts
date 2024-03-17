@@ -42,6 +42,36 @@ export const updateScheduledRace = async (
   });
 };
 
+export const createScheduledRace = async (
+  title: string,
+  weekday: number,
+  time: string,
+  raceSegments: {
+    strava_segment_id: number;
+    jersey: Jersey;
+  }[]
+) => {
+  return await prisma.scheduledRace.create({
+    data: {
+      title: title,
+      weekday: weekday,
+      start_time: time,
+      RaceSegment: {
+        create: raceSegments,
+      },
+      race_type: "RACE",
+    },
+  });
+};
+
+export const deleteScheduledRace = async (id: number) => {
+  return await prisma.scheduledRace.delete({
+    where: {
+      id: id,
+    },
+  });
+};
+
 // RACES
 export const getAllRaces = async () => {
   return await prisma.race.findMany({

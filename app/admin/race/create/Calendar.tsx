@@ -20,7 +20,11 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { Jersey } from "@/app/components/Jerseys";
-import { updateScheduled } from "@/app/actions";
+import {
+  createScheduled,
+  deleteScheduled,
+  updateScheduled,
+} from "@/app/actions";
 
 const weekDays = ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"];
 const weekDaysLong = [
@@ -43,6 +47,7 @@ export default function Calendar({
   const [weekDay, setWeekDay] = useState(5);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [openEvent, setOpenEvent] = useState<{
+    action: "create" | "update";
     id: number;
     title: string;
     weekday: number;
@@ -52,7 +57,6 @@ export default function Calendar({
       strava_id: number | null;
     }[];
   } | null>(null);
-  console.log("openEvent", openEvent);
 
   useEffect(() => {
     if (container.current) {
@@ -91,6 +95,24 @@ export default function Calendar({
 
   return (
     <div className="w-full px-2">
+      <div className="flex justify-end mb-4">
+        <Button
+          color="primary"
+          onClick={() => {
+            setOpenEvent({
+              action: "create",
+              id: 0,
+              title: "",
+              start_time: "06:10",
+              weekday: 0,
+              jerseys: [],
+            });
+            onOpen();
+          }}
+        >
+          Bæta við
+        </Button>
+      </div>
       <div>
         <div className="flex h-full flex-col">
           <div className="isolate flex flex-auto flex-col bg-white">
@@ -329,6 +351,7 @@ export default function Calendar({
                       <div
                         onClick={() => {
                           setOpenEvent({
+                            action: "update",
                             id: s.id,
                             title: s.title || "",
                             start_time: s.start_time,
@@ -549,19 +572,41 @@ export default function Calendar({
                 <Button color="danger" variant="light" onPress={onClose}>
                   Loka
                 </Button>
+                {openEvent!.action === "update" && (
+                  <Button
+                    color="danger"
+                    variant="bordered"
+                    onPress={() => {
+                      deleteScheduled(openEvent!.id);
+                      onClose();
+                    }}
+                  >
+                    Eyða
+                  </Button>
+                )}
                 <Button
                   color="primary"
                   onPress={() => {
-                    updateScheduled(
-                      openEvent!.id,
-                      openEvent!.title,
-                      openEvent!.weekday,
-                      openEvent!.start_time,
-                      openEvent!.jerseys.map((j) => ({
-                        strava_segment_id: j.strava_id || 0,
-                        jersey: j.key,
-                      }))
-                    );
+                    openEvent!.action === "update"
+                      ? updateScheduled(
+                          openEvent!.id,
+                          openEvent!.title,
+                          openEvent!.weekday,
+                          openEvent!.start_time,
+                          openEvent!.jerseys.map((j) => ({
+                            strava_segment_id: j.strava_id || 0,
+                            jersey: j.key,
+                          }))
+                        )
+                      : createScheduled(
+                          openEvent!.title,
+                          openEvent!.weekday,
+                          openEvent!.start_time,
+                          openEvent!.jerseys.map((j) => ({
+                            strava_segment_id: j.strava_id || 0,
+                            jersey: j.key,
+                          }))
+                        );
                     onClose();
                   }}
                 >

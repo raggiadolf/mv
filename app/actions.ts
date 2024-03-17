@@ -7,7 +7,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   createParticipant,
+  createScheduledRace,
   deleteParticipant,
+  deleteScheduledRace,
   updateScheduledRace,
 } from "./queries/mv";
 import { Jersey } from "@prisma/client";
@@ -55,6 +57,26 @@ export async function updateScheduled(
 ) {
   "use server";
   await updateScheduledRace(raceId, title, weekday, time, raceSegments);
+  revalidatePath("/race/create");
+}
+
+export async function createScheduled(
+  title: string,
+  weekday: number,
+  time: string,
+  raceSegments: {
+    strava_segment_id: number;
+    jersey: Jersey;
+  }[]
+) {
+  "use server";
+  await createScheduledRace(title, weekday, time, raceSegments);
+  revalidatePath("/race/create");
+}
+
+export async function deleteScheduled(raceId: number) {
+  "use server";
+  await deleteScheduledRace(raceId);
   revalidatePath("/race/create");
 }
 
