@@ -5,6 +5,10 @@ import type { ScheduledRaceWithSegments } from "@/app/lib/db";
 import {
   Button,
   CheckboxGroup,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
   Input,
   Modal,
   ModalBody,
@@ -19,6 +23,15 @@ import { Jersey } from "@/app/components/Jerseys";
 import { updateScheduled } from "@/app/actions";
 
 const weekDays = ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"];
+const weekDaysLong = [
+  "Mánudagur",
+  "Þriðjudagur",
+  "Miðvikudagur",
+  "Fimmtudagur",
+  "Föstudagur",
+  "Laugardagur",
+  "Sunnudagur",
+];
 
 export default function Calendar({
   schedule,
@@ -371,6 +384,28 @@ export default function Calendar({
                       });
                     }}
                   />
+                  <Dropdown>
+                    <DropdownTrigger className="cursor-pointer">
+                      <Button variant="faded" className="justify-start">
+                        {weekDaysLong[openEvent?.weekday || 0]}
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu>
+                      {weekDaysLong.map((day, index) => (
+                        <DropdownItem
+                          key={index}
+                          onClick={() => {
+                            setOpenEvent({
+                              ...openEvent!,
+                              weekday: index,
+                            });
+                          }}
+                        >
+                          {day}
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </Dropdown>
                   <Input
                     type="text"
                     label="Rástími"
