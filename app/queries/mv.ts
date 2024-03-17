@@ -229,3 +229,38 @@ export const createUser = async (
     },
   });
 };
+
+// RESULTS
+export const getJerseyWinners = async (jersey: Jersey) => {
+  return await prisma.user.findMany({
+    where: {
+      Participant: {
+        some: {
+          jersey: jersey,
+        },
+      },
+    },
+    select: {
+      firstname: true,
+      lastname: true,
+      strava_id: true,
+      profile: true,
+      Participant: {
+        where: { jersey: jersey },
+        include: {
+          Race: true,
+        },
+      },
+      _count: {
+        select: {
+          Participant: { where: { jersey: jersey } },
+        },
+      },
+    },
+    orderBy: {
+      Participant: {
+        _count: "desc",
+      },
+    },
+  });
+};
