@@ -13,6 +13,8 @@ export default async function RaceCard({ id }: { id: number }) {
 
   if (!race) return null;
 
+  const displayUsers = getUsersToDisplay(race.Participant);
+
   return (
     <div className="flex flex-col px-4 py-4 bg-white shadow rounded-md space-y-4">
       <Link href={`/race/${race.id}`}>
@@ -31,7 +33,7 @@ export default async function RaceCard({ id }: { id: number }) {
         <dl className="flex flex-none items-center justify-end">
           <div className="isolate flex overflow-hidden">
             <dt className="sr-only">Participants</dt>
-            {getUsersToDisplay(race.Participant).map((p) => (
+            {displayUsers.map((p) => (
               <dd key={p.id} className="relative inline-block">
                 <Image
                   className="relative inline-block rounded-full ring-2 ring-white"
@@ -48,7 +50,9 @@ export default async function RaceCard({ id }: { id: number }) {
             ))}
           </div>
           <div className="ml-2">
-            + {race.Participant.filter((p) => !p.jersey).length}
+            {displayUsers.length < race.Participant.length && (
+              <span>+ {race.Participant.length - displayUsers.length}</span>
+            )}
           </div>
         </dl>
       </div>
