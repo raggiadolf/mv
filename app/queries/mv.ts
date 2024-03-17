@@ -20,7 +20,8 @@ export const updateScheduledRace = async (
   id: number,
   title: string,
   weekday: number,
-  time: string,
+  hour: number,
+  minute: number,
   raceSegments: {
     strava_segment_id: number;
     jersey: Jersey;
@@ -33,7 +34,8 @@ export const updateScheduledRace = async (
     data: {
       title: title,
       weekday: weekday,
-      start_time: time,
+      start_hour: hour,
+      start_minute: minute,
       RaceSegment: {
         deleteMany: {},
         create: raceSegments,
@@ -45,7 +47,8 @@ export const updateScheduledRace = async (
 export const createScheduledRace = async (
   title: string,
   weekday: number,
-  time: string,
+  hour: number,
+  minute: number,
   raceSegments: {
     strava_segment_id: number;
     jersey: Jersey;
@@ -55,7 +58,8 @@ export const createScheduledRace = async (
     data: {
       title: title,
       weekday: weekday,
-      start_time: time,
+      start_hour: hour,
+      start_minute: minute,
       RaceSegment: {
         create: raceSegments,
       },
@@ -68,6 +72,14 @@ export const deleteScheduledRace = async (id: number) => {
   return await prisma.scheduledRace.delete({
     where: {
       id: id,
+    },
+  });
+};
+
+export const getScheduledRaceForRaceTime = async (date: Date) => {
+  return await prisma.scheduledRace.findFirst({
+    where: {
+      weekday: date.getDay(),
     },
   });
 };
@@ -119,6 +131,7 @@ export const createDefaultMVRace = async (date: Date) => {
     data: {
       date: new Date(`${date.toISOString().split("T")[0]}T06:10:00`),
       race_type: "RACE",
+      scheduled_race_id: 1,
     },
   });
 };
@@ -263,4 +276,37 @@ export const getJerseyWinners = async (jersey: Jersey) => {
       },
     },
   });
+};
+
+export const calculateJerseysForRace = async (raceId: number) => {
+  const scheduledRace = await prisma.scheduledRace.findFirst({
+    where: {
+      id: raceId,
+    },
+  });
+  if (!scheduledRace) {
+    // throw error
+    return null;
+  }
+  const raceSegments = await prisma.raceSegment.findMany({
+    where: {
+      scheduledRaceId: scheduledRace.id,
+    },
+  });
+  const participants = await prisma.participant.findMany({
+    where: {
+      race_id: raceId,
+    },
+    include: {
+      segment_efforts: {
+        where: {
+          strava_segment_id: {
+            in: raceSegments.map((segment) => segment.strava_segment_id),
+          },
+        },
+      },
+    },
+  });
+
+  console.log("participants", participants);
 };

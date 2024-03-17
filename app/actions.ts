@@ -49,28 +49,30 @@ export async function updateScheduled(
   raceId: number,
   title: string,
   weekday: number,
-  time: string,
+  hour: number,
+  minute: number,
   raceSegments: {
     strava_segment_id: number;
     jersey: Jersey;
   }[]
 ) {
   "use server";
-  await updateScheduledRace(raceId, title, weekday, time, raceSegments);
+  await updateScheduledRace(raceId, title, weekday, hour, minute, raceSegments);
   revalidatePath("/race/create");
 }
 
 export async function createScheduled(
   title: string,
   weekday: number,
-  time: string,
+  hour: number,
+  minute: number,
   raceSegments: {
     strava_segment_id: number;
     jersey: Jersey;
   }[]
 ) {
   "use server";
-  await createScheduledRace(title, weekday, time, raceSegments);
+  await createScheduledRace(title, weekday, hour, minute, raceSegments);
   revalidatePath("/race/create");
 }
 

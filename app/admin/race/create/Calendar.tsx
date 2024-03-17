@@ -1,7 +1,5 @@
 "use client";
-import classNames from "@/app/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import type { ScheduledRaceWithSegments } from "@/app/lib/db";
 import {
   Button,
   CheckboxGroup,
@@ -25,6 +23,9 @@ import {
   deleteScheduled,
   updateScheduled,
 } from "@/app/actions";
+import classNames from "@/app/lib/utils";
+
+import type { ScheduledRaceWithSegments } from "@/app/lib/db";
 
 const weekDays = ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"];
 const weekDaysLong = [
@@ -51,7 +52,8 @@ export default function Calendar({
     id: number;
     title: string;
     weekday: number;
-    start_time: string;
+    start_hour: number;
+    start_minute: number;
     jerseys: {
       key: "YELLOW" | "GREEN" | "POLKA" | "OLD";
       strava_id: number | null;
@@ -72,10 +74,7 @@ export default function Calendar({
 
   const scheduleWithCalendarSlots = schedule.map((s) => {
     const daySlot = s.weekday + 1;
-    const timeStart =
-      parseInt(s.start_time.split(":")[0]) * 12 +
-      2 +
-      12 / (60 / parseInt(s.start_time.split(":")[1]));
+    const timeStart = s.start_hour * 12 + 2 + 12 / (60 / s.start_minute);
     return {
       ...s,
       daySlot,
@@ -88,9 +87,7 @@ export default function Calendar({
     const offsetX = e.clientX - boundingClientRect?.left!;
     const offsetY = e.clientY - boundingClientRect?.top!;
     const day = Math.floor(offsetX / (containerWidth / 7.15));
-    console.log("day", weekDays[day]);
     const time = Math.floor(offsetY / (containerWidth / 47));
-    console.log("time", time);
   };
 
   return (
@@ -103,7 +100,8 @@ export default function Calendar({
               action: "create",
               id: 0,
               title: "",
-              start_time: "06:10",
+              start_hour: 6,
+              start_minute: 10,
               weekday: 0,
               jerseys: [],
             });
@@ -354,7 +352,8 @@ export default function Calendar({
                             action: "update",
                             id: s.id,
                             title: s.title || "",
-                            start_time: s.start_time,
+                            start_hour: s.start_hour,
+                            start_minute: s.start_minute,
                             weekday: s.weekday,
                             jerseys: s.RaceSegment.map((r) => ({
                               key: r.jersey,
@@ -374,7 +373,9 @@ export default function Calendar({
                             {s.title}
                           </p>
                           <p className="text-blue-500 group-hover:text-blue-700">
-                            <time dateTime={s.start_time}>{s.start_time}</time>
+                            <time>{`${String(s.start_hour).padStart(2, "0")}:${
+                              s.start_minute
+                            }`}</time>
                           </p>
                         </div>
                       </div>
@@ -431,14 +432,18 @@ export default function Calendar({
                     </DropdownMenu>
                   </Dropdown>
                   <Input
-                    type="text"
                     label="Rástími"
-                    placeholder="06:10"
-                    value={openEvent?.start_time || ""}
+                    className="w-full font-normal bg-transparent !outline-none placeholder:text-foreground-500 focus-visible:outline-none data-[has-start-content=true]:ps-1.5 data-[has-end-content=true]:pe-1.5 text-small group-data-[has-value=true]:text-default-foreground is-filled"
+                    type="time"
+                    value={`${String(openEvent!.start_hour).padStart(
+                      2,
+                      "0"
+                    )}:${String(openEvent!.start_minute).padStart(2, "0")}`}
                     onChange={(e) => {
                       setOpenEvent({
                         ...openEvent!,
-                        start_time: e.target.value,
+                        start_hour: parseInt(e.target.value.split(":")[0]),
+                        start_minute: parseInt(e.target.value.split(":")[1]),
                       });
                     }}
                   />
@@ -593,7 +598,8 @@ export default function Calendar({
                           openEvent!.id,
                           openEvent!.title,
                           openEvent!.weekday,
-                          openEvent!.start_time,
+                          openEvent!.start_hour,
+                          openEvent!.start_minute,
                           openEvent!.jerseys.map((j) => ({
                             strava_segment_id: j.strava_id || 0,
                             jersey: j.key,
@@ -602,7 +608,8 @@ export default function Calendar({
                       : createScheduled(
                           openEvent!.title,
                           openEvent!.weekday,
-                          openEvent!.start_time,
+                          openEvent!.start_hour,
+                          openEvent!.start_minute,
                           openEvent!.jerseys.map((j) => ({
                             strava_segment_id: j.strava_id || 0,
                             jersey: j.key,
