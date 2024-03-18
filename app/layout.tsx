@@ -8,7 +8,12 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
-(BigInt.prototype as any).toJSON = function () {
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
