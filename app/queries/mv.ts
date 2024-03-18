@@ -142,7 +142,6 @@ export const createDefaultMVRace = async (date: Date) => {
   return await prisma.race.create({
     data: {
       date: new Date(`${date.toISOString().split("T")[0]}T06:10:00`),
-      race_type: "RACE",
       scheduled_race_id: 1,
     },
   });
@@ -265,7 +264,9 @@ export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
     where: {
       Participant: {
         some: {
-          jersey: jersey,
+          jerseys: {
+            has: jersey,
+          },
         },
       },
     },
@@ -275,14 +276,24 @@ export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
       strava_id: true,
       profile: true,
       Participant: {
-        where: { jersey: jersey },
+        where: {
+          jerseys: {
+            has: jersey,
+          },
+        },
         include: {
           Race: true,
         },
       },
       _count: {
         select: {
-          Participant: { where: { jersey: jersey } },
+          Participant: {
+            where: {
+              jerseys: {
+                has: jersey,
+              },
+            },
+          },
         },
       },
     },
@@ -295,23 +306,29 @@ export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
 };
 
 export const calculateJerseysForRace = async (raceId: number) => {
-  const scheduledRace = await prisma.scheduledRace.findFirst({
+  console.log("here", raceId);
+  const race = await prisma.race.findFirst({
     where: {
       id: raceId,
     },
+    include: {
+      ScheduledRace: true,
+    },
   });
-  if (!scheduledRace) {
+  console.log("scheduledRace", race);
+  if (!race?.ScheduledRace) {
     // throw error
     return null;
   }
   const raceSegments = await prisma.raceSegment.findMany({
     where: {
-      scheduledRaceId: scheduledRace.id,
+      scheduledRaceId: race.ScheduledRace.id,
     },
   });
+  console.log("raceSegments", raceSegments);
   const participants = await prisma.participant.findMany({
     where: {
-      race_id: raceId,
+      race_id: race.id,
     },
     include: {
       segment_efforts: {

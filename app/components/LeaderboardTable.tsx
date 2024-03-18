@@ -38,37 +38,40 @@ export default function LeaderboardTable({
         <TableColumn>Fjöldi</TableColumn>
       </TableHeader>
       <TableBody>
-        {participants.map((p, i) => {
-          const mostRecentDate = p.Participant.sort(
-            (a, b) =>
-              new Date(b.Race.date).getDate() - new Date(a.Race.date).getDate()
-          )[0].Race.date;
-          return (
-            <TableRow key={p.strava_id}>
-              <TableCell>
-                {i === 0 ? <TrophyIcon className="h-5 w-5" /> : i + 1}
-              </TableCell>
-              <TableCell>
-                <User
-                  avatarProps={{ radius: "lg", src: p.profile }}
-                  description={p.lastname}
-                  name={p.firstname}
-                />
-              </TableCell>
-              <TableCell>
-                <Tooltip
-                  placement="top-start"
-                  content={formatRelative(mostRecentDate, new Date(), {
-                    locale: is,
-                  })}
-                >
-                  <p>{formatDistanceToNow(mostRecentDate, { locale: is })}</p>
-                </Tooltip>
-              </TableCell>
-              <TableCell>{p._count.Participant}</TableCell>
-            </TableRow>
-          );
-        })}
+        {participants
+          .sort((a, b) => b._count.Participant - a._count.Participant)
+          .map((p, i) => {
+            const mostRecentDate = p.Participant.sort(
+              (a, b) =>
+                new Date(b.Race.date).getDate() -
+                new Date(a.Race.date).getDate()
+            )[0].Race.date;
+            return (
+              <TableRow key={p.strava_id}>
+                <TableCell>
+                  {i === 0 ? <TrophyIcon className="h-5 w-5" /> : i + 1}
+                </TableCell>
+                <TableCell>
+                  <User
+                    avatarProps={{ radius: "lg", src: p.profile }}
+                    description={p.lastname}
+                    name={p.firstname}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Tooltip
+                    placement="top-start"
+                    content={formatRelative(mostRecentDate, new Date(), {
+                      locale: is,
+                    })}
+                  >
+                    <p>{formatDistanceToNow(mostRecentDate, { locale: is })}</p>
+                  </Tooltip>
+                </TableCell>
+                <TableCell>{p._count.Participant}</TableCell>
+              </TableRow>
+            );
+          })}
       </TableBody>
     </Table>
   );

@@ -33,7 +33,7 @@ export default async function RaceCard({ id }: { id: number }) {
         <dl className="flex flex-none items-center justify-end">
           <div className="isolate flex overflow-hidden">
             <dt className="sr-only">Participants</dt>
-            {displayUsers.map((p) => (
+            {displayUsers.map((p, i) => (
               <dd key={p.id} className="relative inline-block">
                 <Image
                   className="relative inline-block rounded-full ring-2 ring-white"
@@ -79,11 +79,16 @@ const sortByJerseys = (a: any, b: any) => {
 };
 const getUsersToDisplay = (participants: any) => {
   const max = 4;
-  const jerseyUsers = participants
-    .filter((p: any) => p.jersey)
-    .sort(sortByJerseys);
+  const jerseyUsers = jerseyOrder
+    .map((jersey) => {
+      return {
+        ...participants.find((p: any) => p.jerseys.includes(jersey)),
+        jersey,
+      };
+    })
+    .filter((p) => p.id);
   const fillerUsers = participants
-    .filter((p: any) => !p.jersey)
+    .filter((p: any) => !p.jerseys.length)
     .slice(0, max - jerseyUsers.length);
   return [...jerseyUsers, ...fillerUsers];
 };

@@ -31,7 +31,9 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                   avatarProps={{ radius: "lg", src: p.User.profile || "" }}
                   name={p.User.firstname}
                 />
-                <Jersey jersey={p.jersey} className="ml-2 h-6 w-6" />
+                {p.jerseys.map((j) => (
+                  <Jersey key={j} jersey={j} className="h-4 w-4" />
+                ))}
               </TableCell>
             </TableRow>
           ))}
@@ -41,6 +43,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
   );
 }
 
+// TODO: Sort by MV segment
 const jerseyOrder = ["YELLOW", "OLD", "POLKA", "GREEN", null];
 const sortByJerseys = (a: any, b: any) => {
   return jerseyOrder.indexOf(a.jersey) - jerseyOrder.indexOf(b.jersey);

@@ -114,7 +114,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-02T06:00:00"),
-      race_type: "RACE",
       scheduled_race_id: fridayRace.id,
     },
   });
@@ -123,7 +122,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-09T06:00:00"),
-      race_type: "RACE",
       scheduled_race_id: fridayRace.id,
     },
   });
@@ -132,7 +130,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-16T06:00:00"),
-      race_type: "RACE",
       scheduled_race_id: fridayRace.id,
     },
   });
@@ -141,7 +138,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-23T06:00:00"),
-      race_type: "RACE",
       scheduled_race_id: fridayRace.id,
     },
   });
@@ -150,7 +146,6 @@ async function main() {
     update: {},
     create: {
       date: new Date("2023-06-30T06:00:00"),
-      race_type: "RACE",
       scheduled_race_id: fridayRace.id,
     },
   });
@@ -162,7 +157,7 @@ async function main() {
     create: {
       user_id: jonG.id,
       race_id: race5.id,
-      jersey: "POLKA",
+      jerseys: ["POLKA"],
       strava_activity_id: 1234,
     },
   });
@@ -172,7 +167,7 @@ async function main() {
     create: {
       user_id: ingvar.id,
       race_id: race5.id,
-      jersey: "YELLOW",
+      jerseys: ["YELLOW"],
       strava_activity_id: 1234,
     },
   });
@@ -182,7 +177,7 @@ async function main() {
     create: {
       user_id: oskar.id,
       race_id: race5.id,
-      jersey: "GREEN",
+      jerseys: ["GREEN"],
       strava_activity_id: 1234,
     },
   });
@@ -192,7 +187,7 @@ async function main() {
     create: {
       user_id: thomas.id,
       race_id: race5.id,
-      jersey: "OLD",
+      jerseys: ["OLD"],
       strava_activity_id: 1234,
     },
   });

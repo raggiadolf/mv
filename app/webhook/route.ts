@@ -3,6 +3,7 @@ import { StravaTokens } from "arctic";
 import { strava } from "../lib/auth";
 import { isFriday, addSeconds } from "date-fns";
 import {
+  calculateJerseysForRace,
   createDefaultMVRace,
   createParticipantFromStrava,
   findRaceOnDate,
@@ -76,6 +77,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       } catch (e) {
         console.error("Error creating participant", e);
       }
+      await calculateJerseysForRace(race.id);
     }
   }
   return NextResponse.json({ received: true });
