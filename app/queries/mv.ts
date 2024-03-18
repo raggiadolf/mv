@@ -315,7 +315,6 @@ export const calculateJerseysForRace = async (raceId: number) => {
       ScheduledRace: true,
     },
   });
-  console.log("scheduledRace", race);
   if (!race?.ScheduledRace) {
     // throw error
     return null;
@@ -325,7 +324,6 @@ export const calculateJerseysForRace = async (raceId: number) => {
       scheduledRaceId: race.ScheduledRace.id,
     },
   });
-  console.log("raceSegments", raceSegments);
   const participants = await prisma.participant.findMany({
     where: {
       race_id: race.id,
@@ -338,8 +336,127 @@ export const calculateJerseysForRace = async (raceId: number) => {
           },
         },
       },
+      User: {
+        select: {
+          eligible_for_old: true,
+        },
+      },
     },
   });
 
-  console.log("participants", participants);
+  for (const segment of raceSegments) {
+    const segmentEfforts = participants
+      .map((p) => {
+        return p.segment_efforts.find((effort) => {
+          if (segment.jersey === "OLD") {
+            return (
+              effort.strava_segment_id === segment.strava_segment_id &&
+              p.User.eligible_for_old
+            );
+          }
+          return effort.strava_segment_id === segment.strava_segment_id;
+        });
+      })
+      .filter(Boolean);
+    const bestEffort = segmentEfforts
+      ?.sort(
+        (a, b) => (a?.end_date?.getTime() || 0) - (b?.end_date?.getTime() || 0)
+      )
+      .at(0);
+    if (bestEffort) {
+      await addJerseyToParticipant(bestEffort.participantId!, segment.jersey);
+    }
+  }
+};
+
+export const addJerseyToParticipant = async (
+  participantId: number,
+  jersey: Jersey
+) => {
+  const participantJerseys = await prisma.participant.findUnique({
+    where: {
+      id: participantId,
+    },
+    select: {
+      jerseys: true,
+      race_id: true,
+    },
+  });
+  if (participantJerseys?.jerseys.includes(jersey)) {
+    // throw error?
+    return participantJerseys;
+  }
+  if (!participantJerseys) {
+    // throw error
+    return null;
+  }
+
+  await removeJerseyFromRace(participantJerseys?.race_id, jersey);
+
+  return await prisma.participant.update({
+    where: {
+      id: participantId,
+    },
+    data: {
+      jerseys: {
+        push: jersey,
+      },
+    },
+  });
+};
+
+export const removeJerseyFromParticipant = async (
+  participantId: number,
+  jersey: Jersey
+) => {
+  const participantJerseys = await prisma.participant.findUnique({
+    where: {
+      id: participantId,
+    },
+    select: {
+      jerseys: true,
+    },
+  });
+  if (!participantJerseys?.jerseys.includes(jersey)) {
+    // throw error?
+    return participantJerseys;
+  }
+
+  return await prisma.participant.update({
+    where: {
+      id: participantId,
+    },
+    data: {
+      jerseys: {
+        set: participantJerseys.jerseys.filter((j) => j !== jersey),
+      },
+    },
+  });
+};
+
+export const removeJerseyFromRace = async (raceId: number, jersey: Jersey) => {
+  const participants = await prisma.participant.findMany({
+    where: {
+      race_id: raceId,
+    },
+    select: {
+      id: true,
+      jerseys: true,
+    },
+  });
+
+  for (const participant of participants) {
+    if (participant.jerseys.includes(jersey)) {
+      await prisma.participant.update({
+        where: {
+          id: participant.id,
+        },
+        data: {
+          jerseys: {
+            set: participant.jerseys.filter((j) => j !== jersey),
+          },
+        },
+      });
+    }
+  }
 };

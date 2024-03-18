@@ -34,7 +34,7 @@ export default async function RaceCard({ id }: { id: number }) {
           <div className="isolate flex overflow-hidden">
             <dt className="sr-only">Participants</dt>
             {displayUsers.map((p, i) => (
-              <dd key={p.id} className="relative inline-block">
+              <dd key={`${p.id}-${p.jersey}`} className="relative inline-block">
                 <Image
                   className="relative inline-block rounded-full ring-2 ring-white"
                   width={35}
