@@ -6,26 +6,11 @@ import { lucia, validateRequest } from "./lib/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
-  createParticipant,
   createScheduledRace,
-  deleteParticipant,
   deleteScheduledRace,
   updateScheduledRace,
 } from "./queries/mv";
 import { Jersey } from "@prisma/client";
-
-export async function updateAttendance(
-  attendance: "present" | "absent",
-  userId: string,
-  raceId: number,
-  stravaActivityId?: number
-) {
-  attendance === "absent"
-    ? await deleteParticipant(userId, raceId)
-    : await createParticipant(userId, raceId, stravaActivityId);
-
-  revalidatePath("/races");
-}
 
 export async function logout(): Promise<ActionResult> {
   "use server";

@@ -22,16 +22,12 @@ export default async function RaceCard({ id }: { id: number }) {
         </div>
         {user && (
           <div className="">
-            <AttendancePill
-              present={race.Participant.some((p) => p.User.id === user.id)}
-              userId={user.id}
-              raceId={race.id}
-            />
+            <AttendancePill userId={user.id} raceId={race.id} />
           </div>
         )}
       </div>
       <div className="flex justify-between">
-        <RaceInfo id={id} participants={race.Participant} />
+        <RaceInfo id={id} />
       </div>
     </div>
   );

@@ -157,6 +157,17 @@ export const createDefaultMVRace = async (date: Date) => {
 };
 
 // PARTICIPANTS
+export const getAllParticipantsForRace = async (raceId: number) => {
+  return await prisma.participant.findMany({
+    where: {
+      race_id: raceId,
+    },
+    include: {
+      User: true,
+    },
+  });
+};
+
 export const createParticipantFromStrava = async (
   userId: string,
   raceId: number,
@@ -183,6 +194,18 @@ export const createParticipantFromStrava = async (
         //   id: effort.race_segment_id,
         // })),
       },
+    },
+  });
+};
+
+export const getParticipationByUserForRace = async (
+  userId: string,
+  raceId: number
+) => {
+  return await prisma.participant.findFirst({
+    where: {
+      user_id: userId,
+      race_id: raceId,
     },
   });
 };

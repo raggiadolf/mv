@@ -12,16 +12,13 @@ async function getJerseyInfo(id: number, jersey: JerseyType) {
     res.json()
   );
 }
+async function getParticipants(id: number) {
+  return await fetch(`/race/${id}/participants`).then((res) => res.json());
+}
 
-export default function RaceInfo({
-  id,
-  participants,
-}: {
-  id: number;
-  participants: Participant[];
-}) {
+export default function RaceInfo({ id }: { id: number }) {
   const [jerseyToDisplay, setJerseyToDisplay] = useState<JerseyType>("YELLOW");
-  const { data, isFetching } = useQuery<{
+  const { data: jerseyInfo, isFetching: isFetchingInfo } = useQuery<{
     time: number;
     distance: number;
     watts: number;
@@ -32,23 +29,25 @@ export default function RaceInfo({
     queryKey: ["race", id, jerseyToDisplay],
     queryFn: () => getJerseyInfo(id, jerseyToDisplay),
   });
-  console.log("data", data);
-  console.log("jerseyToDisplay", jerseyToDisplay);
+  const { data: allParticipants } = useQuery<Participant[]>({
+    queryKey: ["participants", id],
+    queryFn: () => getParticipants(id),
+  });
 
-  const displayUsers = getUsersToDisplay(participants);
+  const displayUsers = getUsersToDisplay(allParticipants || []);
 
   return (
     <>
       <div className="flex">
-        {isFetching ? (
+        {isFetchingInfo ? (
           <Spinner size="lg" />
-        ) : data ? (
+        ) : jerseyInfo ? (
           <>
             <div className="relative">
               <a
                 href={
-                  data.activity_id
-                    ? `https://www.strava.com/activities/${data.activity_id}`
+                  jerseyInfo.activity_id
+                    ? `https://www.strava.com/activities/${jerseyInfo.activity_id}`
                     : "#"
                 }
                 target="_blank"
@@ -57,8 +56,8 @@ export default function RaceInfo({
                   className="rounded-md"
                   width={75}
                   height={75}
-                  src={data.user.profile || ""}
-                  alt={data.user.firstname || ""}
+                  src={jerseyInfo.user.profile || ""}
+                  alt={jerseyInfo.user.firstname || ""}
                 />
                 <Jersey
                   className="h-8 w-8 absolute -bottom-1 -right-1 block"
@@ -68,17 +67,22 @@ export default function RaceInfo({
             </div>
             <div className="flex flex-col ml-2 text-sm">
               <div>
-                <p className="font-bold">{data.user.firstname}</p>
+                <p className="font-bold">{jerseyInfo.user.firstname}</p>
               </div>
               <div className="flex items-center space-x-1">
-                <p>{`⏱️ ${~~(data.time / 60)}:${data.time % 60}`}</p>
+                <p>{`⏱️ ${~~(jerseyInfo.time / 60)}:${
+                  jerseyInfo.time % 60
+                }`}</p>
               </div>
               <div>
-                <p>{`🏎️ ${((data.distance / data.time) * (18 / 5)).toFixed(
-                  1
-                )} km/klst`}</p>
+                <p>{`🏎️ ${(
+                  (jerseyInfo.distance / jerseyInfo.time) *
+                  (18 / 5)
+                ).toFixed(1)} km/klst`}</p>
               </div>
-              <div>{data.watts && <p>{`⚡ ${data.watts}w`}</p>}</div>
+              <div>
+                {jerseyInfo.watts && <p>{`⚡ ${jerseyInfo.watts}w`}</p>}
+              </div>
             </div>
           </>
         ) : (
@@ -89,7 +93,7 @@ export default function RaceInfo({
         <ParticipantList
           participants={displayUsers}
           jerseyToHide={jerseyToDisplay}
-          noOfRaceParticipants={participants.length}
+          noOfRaceParticipants={allParticipants?.length || 0}
           setJerseyToDisplay={setJerseyToDisplay}
         />
       </div>
