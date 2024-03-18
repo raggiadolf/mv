@@ -71,7 +71,7 @@ export default function RaceInfo({
                 <p className="font-bold">{data.user.firstname}</p>
               </div>
               <div className="flex items-center space-x-1">
-                <p>{`⏱️ ${data.time}`}</p>
+                <p>{`⏱️ ${~~(data.time / 60)}:${data.time % 60}`}</p>
               </div>
               <div>
                 <p>{`🏎️ ${((data.distance / data.time) * (18 / 5)).toFixed(
