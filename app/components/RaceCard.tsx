@@ -21,7 +21,7 @@ export default async function RaceCard({ id }: { id: number }) {
           </Link>
         </div>
         {user && (
-          <div className="">
+          <div className="-mt-2">
             <AttendancePill userId={user.id} raceId={race.id} />
           </div>
         )}
