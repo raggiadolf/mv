@@ -7,12 +7,6 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-declare global {
-  interface BigInt {
-    toJSON(): string;
-  }
-}
-
 export function Providers({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [client] = useState(
@@ -20,10 +14,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
       defaultOptions: { queries: { staleTime: 1000 * 60 * 5 } },
     })
   );
-
-  BigInt.prototype.toJSON = function () {
-    return this.toString();
-  };
 
   return (
     <QueryClientProvider client={client}>

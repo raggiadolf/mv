@@ -3,7 +3,16 @@ import prisma from "../lib/db";
 import { StravaUser } from "../login/strava/callback/route";
 import { generateId } from "lucia";
 import { Jersey } from "@prisma/client";
-import { getHours, getISODay, getMinutes } from "date-fns";
+import { getHours, getISODay } from "date-fns";
+
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 
 // SCHEDULED RACES
 export const getAllScheduledRaces = async () => {
