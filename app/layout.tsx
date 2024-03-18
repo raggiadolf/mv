@@ -8,15 +8,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
-declare global {
-  interface BigInt {
-    toJSON(): string;
-  }
-}
-BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
-
 export const metadata: Metadata = {
   title: "Morgunvaktin",
   description: "MV",
