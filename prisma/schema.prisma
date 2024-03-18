@@ -63,8 +63,8 @@ model SegmentEffort {
   distance_in_meters      Float
   Participant             Participant? @relation(fields: [participantId], references: [id])
   participantId           Int?
-  RaceSegment             RaceSegment  @relation(fields: [raceSegmentId], references: [id])
-  raceSegmentId           Int
+  RaceSegment             RaceSegment? @relation(fields: [race_segment_id], references: [id])
+  race_segment_id         Int?
 }
 
 model RaceSegment {

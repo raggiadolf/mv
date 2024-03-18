@@ -46,27 +46,33 @@ export async function POST(req: Request): Promise<NextResponse> {
         // Create if not available?
         race = await createDefaultMVRace(new Date(activity.start_date_local));
       }
-      const activityRaceSegments = activity.segment_efforts.filter((se: any) =>
-        scheduledRace.RaceSegment.map((rs: any) =>
-          Number(rs.strava_segment_id)
-        ).includes(se.segment.id)
-      );
-      console.log("activityRaceSegments", activityRaceSegments);
+
+      const raceSegments = activity.segment_efforts.map((se: any) => {
+        const scheduledRaceSegment = scheduledRace.RaceSegment.find(
+          (rs: any) => Number(rs.strava_segment_id) === se.segment.id
+        );
+        if (scheduledRaceSegment) {
+          return {
+            strava_segment_id: se.segment.id,
+            elapsed_time_in_seconds: se.elapsed_time,
+            start_date: se.start_date_local,
+            end_date: addSeconds(se.start_date_local, se.elapsed_time),
+            is_kom: !!se.is_kom,
+            average_watts: se.average_watts,
+            distance_in_meters: se.distance,
+            race_segment_id: scheduledRaceSegment.id,
+          };
+        }
+        return null;
+      });
+      const filteredRaceSegments = raceSegments.filter(Boolean);
       try {
-        // await createParticipantFromStrava(
-        //   user.id,
-        //   race.id,
-        //   activity.segment_efforts.map((effort: any) => ({
-        //     strava_segment_id: effort.segment.id,
-        //     elapsed_time_in_seconds: effort.elapsed_time,
-        //     start_date: effort.start_date_local,
-        //     end_date: addSeconds(effort.start_date_local, effort.elapsed_time),
-        //     is_kom: !!effort.is_kom,
-        //     average_watts: effort.average_watts,
-        //     distance_in_meters: effort.distance,
-        //   })),
-        //   activity.id
-        // );
+        await createParticipantFromStrava(
+          user.id,
+          race.id,
+          filteredRaceSegments,
+          activity.id
+        );
       } catch (e) {
         console.error("Error creating participant", e);
       }
