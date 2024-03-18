@@ -22,9 +22,8 @@ export default function AttendancePill({
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button size="sm" variant="light">
+        <Button variant="light" isIconOnly>
           {present ? <CheckCircle /> : <CrossCircle />}
-          {present ? "Mætti" : "Mætti ekki"}
         </Button>
       </DropdownTrigger>
       <DropdownMenu

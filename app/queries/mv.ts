@@ -469,3 +469,46 @@ export const removeJerseyFromRace = async (raceId: number, jersey: Jersey) => {
     }
   }
 };
+
+export const getJerseyInfoForRace = async (raceId: number, jersey: Jersey) => {
+  const participant = await prisma.participant.findFirst({
+    where: {
+      race_id: raceId,
+      jerseys: {
+        has: jersey,
+      },
+      segment_efforts: {
+        some: {
+          RaceSegment: {
+            jersey: jersey,
+          },
+        },
+      },
+    },
+    include: {
+      User: true,
+      segment_efforts: {
+        where: {
+          RaceSegment: {
+            jersey: jersey,
+          },
+        },
+      },
+    },
+  });
+  if (!participant || !participant.segment_efforts[0]) {
+    return null;
+  }
+  const time = participant.segment_efforts[0].elapsed_time_in_seconds;
+  const distance = participant.segment_efforts[0].distance_in_meters;
+  const watts = participant.segment_efforts[0].average_watts;
+  const is_kom = participant.segment_efforts[0].is_kom;
+  return {
+    time,
+    distance,
+    watts,
+    is_kom,
+    user: participant.User,
+    activity_id: Number(participant.strava_activity_id),
+  };
+};
