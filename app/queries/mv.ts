@@ -260,7 +260,7 @@ export const createUser = async (
 };
 
 // RESULTS
-export const getJerseyWinners = async (jersey: Jersey) => {
+export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
   return await prisma.user.findMany({
     where: {
       Participant: {

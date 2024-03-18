@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getJerseyWinners } from "../queries/mv";
+import { getNumberOfJerseysForUser } from "../queries/mv";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     jersey === "POLKA" ||
     jersey === "OLD"
   ) {
-    const results = await getJerseyWinners(jersey);
+    const results = await getNumberOfJerseysForUser(jersey);
     return new Response(JSON.stringify(results), { status: 200 });
   }
 
