@@ -5,7 +5,7 @@ import { Jersey } from "./Jerseys";
 import { Jersey as JerseyType, Participant, User } from "@prisma/client";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Spinner } from "@nextui-org/react";
+import { Skeleton } from "@nextui-org/react";
 
 async function getJerseyInfo(id: number, jersey: JerseyType) {
   return await fetch(`/race/${id}/jersey?jersey=${jersey}`).then((res) =>
@@ -40,7 +40,7 @@ export default function RaceInfo({ id }: { id: number }) {
     <>
       <div className="flex">
         {isFetchingInfo ? (
-          <Spinner size="lg" />
+          <Skeleton className="rounded-md w-[80px] h-[80px]" />
         ) : jerseyInfo ? (
           <>
             <div className="relative">
