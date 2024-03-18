@@ -78,7 +78,7 @@ export default function AttendancePill({
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Attendance"
-        color={present ? "success" : "warning"}
+        color={present ? "danger" : "success"}
         variant="faded"
         onAction={(e) => {
           mutation.mutate();
