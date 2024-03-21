@@ -1,18 +1,18 @@
-import { StravaTokens } from "arctic";
-import prisma from "../lib/db";
-import { StravaUser } from "../login/strava/callback/route";
-import { generateId } from "lucia";
-import { Jersey } from "@prisma/client";
-import { getHours, getISODay } from "date-fns";
+import { StravaTokens } from "arctic"
+import prisma from "../lib/db"
+import { StravaUser } from "../login/strava/callback/route"
+import { generateId } from "lucia"
+import { Jersey } from "@prisma/client"
+import { getHours, getISODay } from "date-fns"
 
 declare global {
   interface BigInt {
-    toJSON(): string;
+    toJSON(): string
   }
 }
 BigInt.prototype.toJSON = function () {
-  return this.toString();
-};
+  return this.toString()
+}
 
 // SCHEDULED RACES
 export const getAllScheduledRaces = async () => {
@@ -23,8 +23,8 @@ export const getAllScheduledRaces = async () => {
     include: {
       RaceSegment: true,
     },
-  });
-};
+  })
+}
 
 export const updateScheduledRace = async (
   id: number,
@@ -33,8 +33,8 @@ export const updateScheduledRace = async (
   hour: number,
   minute: number,
   raceSegments: {
-    strava_segment_id: number;
-    jersey: Jersey;
+    strava_segment_id: number
+    jersey: Jersey
   }[]
 ) => {
   return await prisma.scheduledRace.update({
@@ -51,8 +51,8 @@ export const updateScheduledRace = async (
         create: raceSegments,
       },
     },
-  });
-};
+  })
+}
 
 export const createScheduledRace = async (
   title: string,
@@ -60,8 +60,8 @@ export const createScheduledRace = async (
   hour: number,
   minute: number,
   raceSegments: {
-    strava_segment_id: number;
-    jersey: Jersey;
+    strava_segment_id: number
+    jersey: Jersey
   }[]
 ) => {
   return await prisma.scheduledRace.create({
@@ -75,20 +75,20 @@ export const createScheduledRace = async (
       },
       race_type: "RACE",
     },
-  });
-};
+  })
+}
 
 export const deleteScheduledRace = async (id: number) => {
   return await prisma.scheduledRace.delete({
     where: {
       id: id,
     },
-  });
-};
+  })
+}
 
 export const getScheduledRaceForRaceTime = async (date: Date) => {
-  const zeroBasedISODay = getISODay(date) - 1;
-  const startHourOfRide = getHours(date);
+  const zeroBasedISODay = getISODay(date) - 1
+  const startHourOfRide = getHours(date)
   const race = await prisma.scheduledRace.findFirst({
     where: {
       weekday: zeroBasedISODay,
@@ -100,10 +100,10 @@ export const getScheduledRaceForRaceTime = async (date: Date) => {
     include: {
       RaceSegment: true,
     },
-  });
+  })
 
-  return race;
-};
+  return race
+}
 
 // RACES
 export const getAllRaces = async () => {
@@ -118,8 +118,8 @@ export const getAllRaces = async () => {
         },
       },
     },
-  });
-};
+  })
+}
 
 export const getRaceById = async (id: number) => {
   return await prisma.race.findUnique({
@@ -133,8 +133,8 @@ export const getRaceById = async (id: number) => {
         },
       },
     },
-  });
-};
+  })
+}
 
 export const findRaceOnDate = async (date: Date) => {
   return await prisma.race.findFirst({
@@ -144,8 +144,8 @@ export const findRaceOnDate = async (date: Date) => {
         lte: new Date(`${date.toISOString().split("T")[0]}T23:59:59`),
       },
     },
-  });
-};
+  })
+}
 
 export const createDefaultMVRace = async (date: Date) => {
   return await prisma.race.create({
@@ -153,8 +153,8 @@ export const createDefaultMVRace = async (date: Date) => {
       date: new Date(`${date.toISOString().split("T")[0]}T06:10:00`),
       scheduled_race_id: 1,
     },
-  });
-};
+  })
+}
 
 // PARTICIPANTS
 export const getAllParticipantsForRace = async (raceId: number) => {
@@ -165,21 +165,21 @@ export const getAllParticipantsForRace = async (raceId: number) => {
     include: {
       User: true,
     },
-  });
-};
+  })
+}
 
 export const createParticipantFromStrava = async (
   userId: string,
   raceId: number,
   segmentEfforts: {
-    strava_segment_id: number;
-    elapsed_time_in_seconds: number;
-    start_date: Date;
-    end_date: Date;
-    is_kom: boolean;
-    average_watts: number;
-    distance_in_meters: number;
-    race_segment_id: number;
+    strava_segment_id: number
+    elapsed_time_in_seconds: number
+    start_date: Date
+    end_date: Date
+    is_kom: boolean
+    average_watts: number
+    distance_in_meters: number
+    race_segment_id: number
   }[],
   stravaActivityId?: number
 ) => {
@@ -195,8 +195,8 @@ export const createParticipantFromStrava = async (
         // })),
       },
     },
-  });
-};
+  })
+}
 
 export const getParticipationByUserForRace = async (
   userId: string,
@@ -207,8 +207,8 @@ export const getParticipationByUserForRace = async (
       user_id: userId,
       race_id: raceId,
     },
-  });
-};
+  })
+}
 
 export const createParticipant = async (
   userId: string,
@@ -221,8 +221,8 @@ export const createParticipant = async (
       user_id: userId,
       strava_activity_id: stravaActivityId,
     },
-  });
-};
+  })
+}
 
 export const deleteParticipant = async (userId: string, raceId: number) => {
   return await prisma.participant.delete({
@@ -232,8 +232,8 @@ export const deleteParticipant = async (userId: string, raceId: number) => {
         user_id: userId,
       },
     },
-  });
-};
+  })
+}
 
 // USERS
 export const getUserByStravaId = async (stravaId: number) => {
@@ -241,8 +241,8 @@ export const getUserByStravaId = async (stravaId: number) => {
     where: {
       strava_id: stravaId,
     },
-  });
-};
+  })
+}
 
 export const updateUserStravaRefreshTokenByUserId = async (
   userId: string,
@@ -255,8 +255,8 @@ export const updateUserStravaRefreshTokenByUserId = async (
     data: {
       strava_refresh_token: refreshToken,
     },
-  });
-};
+  })
+}
 
 export const updateUserStravaRefreshtokenByStravaId = async (
   stravaId: number,
@@ -269,14 +269,14 @@ export const updateUserStravaRefreshtokenByStravaId = async (
     data: {
       strava_refresh_token: refreshToken,
     },
-  });
-};
+  })
+}
 
 export const createUser = async (
   stravaUser: StravaUser,
   tokens: StravaTokens
 ) => {
-  const userId = generateId(15);
+  const userId = generateId(15)
   return await prisma.user.create({
     data: {
       id: userId,
@@ -287,10 +287,36 @@ export const createUser = async (
       profile: stravaUser.profile,
       strava_refresh_token: tokens.refreshToken,
     },
-  });
-};
+  })
+}
 
 // RESULTS
+export const getResultsForRacePerJersey = async (
+  raceId: number,
+  jersey: Jersey
+) => {
+  // Get all participants for raceId
+  // Include their jersey if any
+  // Include their segment effort for passed in jersey
+  const res = await prisma.participant.findMany({
+    where: {
+      race_id: raceId,
+    },
+    include: {
+      User: true,
+      segment_efforts: {
+        take: 1,
+        where: {
+          RaceSegment: {
+            jersey: jersey,
+          },
+        },
+      },
+    },
+  })
+  console.log("res", res)
+  return res
+}
 export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
   return await prisma.user.findMany({
     where: {
@@ -334,11 +360,11 @@ export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
         _count: "desc",
       },
     },
-  });
-};
+  })
+}
 
 export const calculateJerseysForRace = async (raceId: number) => {
-  console.log("here", raceId);
+  console.log("here", raceId)
   const race = await prisma.race.findFirst({
     where: {
       id: raceId,
@@ -346,16 +372,16 @@ export const calculateJerseysForRace = async (raceId: number) => {
     include: {
       ScheduledRace: true,
     },
-  });
+  })
   if (!race?.ScheduledRace) {
     // throw error
-    return null;
+    return null
   }
   const raceSegments = await prisma.raceSegment.findMany({
     where: {
       scheduledRaceId: race.ScheduledRace.id,
     },
-  });
+  })
   const participants = await prisma.participant.findMany({
     where: {
       race_id: race.id,
@@ -374,7 +400,7 @@ export const calculateJerseysForRace = async (raceId: number) => {
         },
       },
     },
-  });
+  })
 
   for (const segment of raceSegments) {
     const segmentEfforts = participants
@@ -384,22 +410,22 @@ export const calculateJerseysForRace = async (raceId: number) => {
             return (
               effort.strava_segment_id === segment.strava_segment_id &&
               p.User.eligible_for_old
-            );
+            )
           }
-          return effort.strava_segment_id === segment.strava_segment_id;
-        });
+          return effort.strava_segment_id === segment.strava_segment_id
+        })
       })
-      .filter(Boolean);
+      .filter(Boolean)
     const bestEffort = segmentEfforts
       ?.sort(
         (a, b) => (a?.end_date?.getTime() || 0) - (b?.end_date?.getTime() || 0)
       )
-      .at(0);
+      .at(0)
     if (bestEffort) {
-      await addJerseyToParticipant(bestEffort.participantId!, segment.jersey);
+      await addJerseyToParticipant(bestEffort.participantId!, segment.jersey)
     }
   }
-};
+}
 
 export const addJerseyToParticipant = async (
   participantId: number,
@@ -413,17 +439,17 @@ export const addJerseyToParticipant = async (
       jerseys: true,
       race_id: true,
     },
-  });
+  })
   if (participantJerseys?.jerseys.includes(jersey)) {
     // throw error?
-    return participantJerseys;
+    return participantJerseys
   }
   if (!participantJerseys) {
     // throw error
-    return null;
+    return null
   }
 
-  await removeJerseyFromRace(participantJerseys?.race_id, jersey);
+  await removeJerseyFromRace(participantJerseys?.race_id, jersey)
 
   return await prisma.participant.update({
     where: {
@@ -434,8 +460,8 @@ export const addJerseyToParticipant = async (
         push: jersey,
       },
     },
-  });
-};
+  })
+}
 
 export const removeJerseyFromParticipant = async (
   participantId: number,
@@ -448,10 +474,10 @@ export const removeJerseyFromParticipant = async (
     select: {
       jerseys: true,
     },
-  });
+  })
   if (!participantJerseys?.jerseys.includes(jersey)) {
     // throw error?
-    return participantJerseys;
+    return participantJerseys
   }
 
   return await prisma.participant.update({
@@ -463,8 +489,8 @@ export const removeJerseyFromParticipant = async (
         set: participantJerseys.jerseys.filter((j) => j !== jersey),
       },
     },
-  });
-};
+  })
+}
 
 export const removeJerseyFromRace = async (raceId: number, jersey: Jersey) => {
   const participants = await prisma.participant.findMany({
@@ -475,7 +501,7 @@ export const removeJerseyFromRace = async (raceId: number, jersey: Jersey) => {
       id: true,
       jerseys: true,
     },
-  });
+  })
 
   for (const participant of participants) {
     if (participant.jerseys.includes(jersey)) {
@@ -488,10 +514,10 @@ export const removeJerseyFromRace = async (raceId: number, jersey: Jersey) => {
             set: participant.jerseys.filter((j) => j !== jersey),
           },
         },
-      });
+      })
     }
   }
-};
+}
 
 export const getJerseyInfoForRace = async (raceId: number, jersey: Jersey) => {
   const participant = await prisma.participant.findFirst({
@@ -518,14 +544,14 @@ export const getJerseyInfoForRace = async (raceId: number, jersey: Jersey) => {
         },
       },
     },
-  });
+  })
   if (!participant || !participant.segment_efforts[0]) {
-    return null;
+    return null
   }
-  const time = participant.segment_efforts[0].elapsed_time_in_seconds;
-  const distance = participant.segment_efforts[0].distance_in_meters;
-  const watts = participant.segment_efforts[0].average_watts;
-  const is_kom = participant.segment_efforts[0].is_kom;
+  const time = participant.segment_efforts[0].elapsed_time_in_seconds
+  const distance = participant.segment_efforts[0].distance_in_meters
+  const watts = participant.segment_efforts[0].average_watts
+  const is_kom = participant.segment_efforts[0].is_kom
   return {
     time,
     distance,
@@ -533,5 +559,5 @@ export const getJerseyInfoForRace = async (raceId: number, jersey: Jersey) => {
     is_kom,
     user: participant.User,
     activity_id: Number(participant.strava_activity_id),
-  };
-};
+  }
+}
