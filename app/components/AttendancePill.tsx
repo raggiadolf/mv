@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import {
   Button,
   Dropdown,
@@ -6,8 +6,8 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Spinner,
-} from "@nextui-org/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+} from "@nextui-org/react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 async function updateAttendance(
   raceId: number,
@@ -21,13 +21,13 @@ async function updateAttendance(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ userId, stravaActivityId, attendance }),
-  });
+  })
 }
 
 async function getAttendance(raceId: number, userId: string) {
   return await fetch(`/race/${raceId}/attendance?user_id=${userId}`).then(
     (res) => res.json()
-  );
+  )
 }
 
 export default function AttendancePill({
@@ -35,11 +35,11 @@ export default function AttendancePill({
   raceId,
   stravaActivityId,
 }: {
-  userId: string;
-  raceId: number;
-  stravaActivityId?: number;
+  userId: string
+  raceId: number
+  stravaActivityId?: number
 }) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: () =>
       updateAttendance(
@@ -54,14 +54,14 @@ export default function AttendancePill({
           queryKey: ["attendance", raceId, userId],
         }),
         queryClient.invalidateQueries({ queryKey: ["participants", raceId] }),
-      ]);
+      ])
     },
-  });
+  })
   const { data, isFetching } = useQuery({
     queryKey: ["attendance", raceId, userId],
     queryFn: () => getAttendance(raceId, userId),
-  });
-  const present = !!data;
+  })
+  const present = !!data
 
   return (
     <Dropdown>
@@ -80,8 +80,8 @@ export default function AttendancePill({
         aria-label="Attendance"
         color={present ? "danger" : "success"}
         variant="faded"
-        onAction={(e) => {
-          mutation.mutate();
+        onAction={(_e) => {
+          mutation.mutate()
         }}
       >
         <DropdownItem key={present ? "absent" : "present"}>
@@ -89,7 +89,7 @@ export default function AttendancePill({
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  );
+  )
 }
 
 function CheckCircle() {
@@ -108,7 +108,7 @@ function CheckCircle() {
         d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
       />
     </svg>
-  );
+  )
 }
 
 function CrossCircle() {
@@ -127,5 +127,5 @@ function CrossCircle() {
         d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
       />
     </svg>
-  );
+  )
 }

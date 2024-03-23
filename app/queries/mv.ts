@@ -295,9 +295,6 @@ export const getResultsForRacePerJersey = async (
   raceId: number,
   jersey: Jersey
 ) => {
-  // Get all participants for raceId
-  // Include their jersey if any
-  // Include their segment effort for passed in jersey
   const res = await prisma.participant.findMany({
     where: {
       race_id: raceId,
@@ -314,8 +311,12 @@ export const getResultsForRacePerJersey = async (
       },
     },
   })
-  console.log("res", res)
-  return res
+  return res.map((p) => ({
+    User: p.User,
+    jerseys: p.jerseys,
+    strava_activity_id: p.strava_activity_id,
+    segment_effort: p.segment_efforts?.at(0) || null,
+  }))
 }
 export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
   return await prisma.user.findMany({

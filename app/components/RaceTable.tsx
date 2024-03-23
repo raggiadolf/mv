@@ -37,11 +37,11 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
         lastname: string
         profile: string
       }
-      segment_efforts: {
-        end_date: Date
+      segment_effort: {
+        end_date: string
         is_kom: boolean
         average_watts: number
-      }[]
+      }
       jerseys: JerseyType[]
     }[]
   >({
@@ -50,7 +50,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
   })
   console.log("data", data)
 
-  const endTimeForFirst = data?.at(0)?.segment_efforts.at(0)?.end_date
+  const endTimeForFirst = data?.at(0)?.segment_effort?.end_date
 
   return (
     <div className="w-full">
@@ -69,33 +69,39 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
               <TableColumn>Tími</TableColumn>
             </TableHeader>
             <TableBody emptyContent={"Engir þátttakendur"}>
-              {data.map((p, i) => (
-                <TableRow key={p.User.id}>
-                  <TableCell>{i + 1}</TableCell>
-                  <TableCell className="flex items-center">
-                    <User
-                      avatarProps={{
-                        radius: "lg",
-                        src: p.User.profile || "",
-                      }}
-                      name={p.User.firstname}
-                    />
-                    {p.jerseys.map((j) => (
-                      <Jersey key={j} jersey={j} className="h-4 w-4" />
-                    ))}
-                  </TableCell>
-                  <TableCell>
-                    {p.segment_efforts.length > 0
-                      ? i === 0
-                        ? format(p.segment_efforts[0].end_date, "HH:MM")
-                        : differenceInSeconds(
-                            p.segment_efforts[0].end_date,
-                            endTimeForFirst!
-                          )
-                      : null}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {data
+                .sort(
+                  (a, b) =>
+                    new Date(a.segment_effort?.end_date).getTime() -
+                    new Date(b.segment_effort?.end_date).getTime()
+                )
+                .map((p, i) => (
+                  <TableRow key={p.User.id}>
+                    <TableCell>{i + 1}</TableCell>
+                    <TableCell className="flex items-center">
+                      <User
+                        avatarProps={{
+                          radius: "lg",
+                          src: p.User.profile || "",
+                        }}
+                        name={p.User.firstname}
+                      />
+                      {p.jerseys.map((j) => (
+                        <Jersey key={j} jersey={j} className="h-4 w-4" />
+                      ))}
+                    </TableCell>
+                    <TableCell>
+                      {p.segment_effort
+                        ? i === 0
+                          ? format(p.segment_effort.end_date, "HH:MM")
+                          : differenceInSeconds(
+                              p.segment_effort.end_date,
+                              data?.at(0)?.segment_effort?.end_date || 0
+                            )
+                        : null}
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         ) : null}

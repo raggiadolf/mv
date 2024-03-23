@@ -3,15 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
 }
 
 model Participant {
   id                 Int             @id @default(autoincrement())
   race_id            Int
   user_id            String
-  jerseys             Jersey[]
+  jerseys            Jersey[]
   Race               Race            @relation(fields: [race_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   User               User            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   strava_activity_id BigInt?
@@ -63,6 +63,8 @@ model SegmentEffort {
   participantId           Int?
   RaceSegment             RaceSegment? @relation(fields: [race_segment_id], references: [id])
   race_segment_id         Int?
+
+  @@unique([participantId, race_segment_id])
 }
 
 model RaceSegment {
