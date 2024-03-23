@@ -96,9 +96,9 @@ enum Jersey {
 }
 
 enum Role {
-  SUPERADMIN
-  ADMIN
   USER
+  ADMIN
+  SUPERADMIN
 }
 
 enum RaceType {
