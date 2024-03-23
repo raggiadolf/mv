@@ -1,8 +1,10 @@
-import { format, isToday, isYesterday } from "date-fns";
-import { is } from "date-fns/locale";
+import { Role } from "@prisma/client"
+import { format, isToday, isYesterday } from "date-fns"
+import { is } from "date-fns/locale"
+import { User } from "lucia"
 
 export default function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(" ")
 }
 
 export function getRelativeDayText(date: Date) {
@@ -10,9 +12,14 @@ export function getRelativeDayText(date: Date) {
     ? "Í dag"
     : isYesterday(date)
     ? "Í gær"
-    : format(date, "iiii", { locale: is });
+    : format(date, "iiii", { locale: is })
 }
 
 export function getFormattedDate(date: Date) {
-  return format(date, "d. LLL").toLowerCase();
+  return format(date, "d. LLL").toLowerCase()
+}
+
+export function satisfiesRole(role: Role, user: User | null) {
+  const roles = Object.values(Role)
+  return user && roles.indexOf(role) <= roles.indexOf(user.role)
 }

@@ -18,11 +18,12 @@ import { RaceWithParticipants } from "../lib/db"
 import { Jersey } from "./Jerseys"
 import { getFormattedDate, getRelativeDayText } from "../lib/utils"
 import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import JerseyTabs from "./JerseyTabs"
 import { Jersey as JerseyType } from "@prisma/client"
 import { differenceInSeconds, format } from "date-fns"
-import { satisfiesRole, useUserContext } from "../UserContext"
+import { useUserContext } from "../UserContext"
+import { satisfiesRole } from "../lib/utils"
 
 async function getResultsForRace(raceId: number, jersey: string) {
   return await fetch(`/race/${raceId}/results?jersey=${jersey}`).then((res) =>
@@ -113,7 +114,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
       </JerseyTabs>
       {satisfiesRole("ADMIN", user) && (
         <div className="flex justify-end">
-          <AdminMenu />
+          <AdminMenu raceId={race.id} />
         </div>
       )}
     </div>
@@ -132,7 +133,22 @@ function DateHeader({ date }: { date: Date }) {
   )
 }
 
-function AdminMenu() {
+async function recalculateResultsForRace(raceId: number) {
+  return await fetch(`/race/${raceId}/results/recalculate`, {
+    method: "POST",
+  })
+}
+
+function AdminMenu({ raceId }: { raceId: number }) {
+  const queryClient = useQueryClient()
+  const recalculateMutation = useMutation({
+    mutationFn: () => recalculateResultsForRace(raceId),
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({
+        queryKey: ["results", raceId],
+      })
+    },
+  })
   return (
     <Dropdown>
       <DropdownTrigger>
@@ -140,8 +156,13 @@ function AdminMenu() {
           <SettingsIcon className="h-5 w-5" />
         </Button>
       </DropdownTrigger>
-      <DropdownMenu>
-        <DropdownItem key="rerun_results">
+      <DropdownMenu
+        onAction={(key) => {
+          console.log("key", key)
+          recalculateMutation.mutate()
+        }}
+      >
+        <DropdownItem key="rerun_results" aria-label="Rerun results">
           <p className="font-semibold">Endurreikna úrslit</p>
         </DropdownItem>
       </DropdownMenu>

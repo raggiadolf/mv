@@ -1,6 +1,5 @@
 "use client"
 import { User } from "lucia"
-import { Role } from "@prisma/client"
 import { createContext, useContext } from "react"
 
 type UserContextProps = {
@@ -19,9 +18,4 @@ export default function UserContext({
   children: React.ReactNode
 }) {
   return <UserCtx.Provider value={{ user }}>{children}</UserCtx.Provider>
-}
-
-export function satisfiesRole(role: Role, user: User | null) {
-  const roles = Object.values(Role)
-  return user && roles.indexOf(role) <= roles.indexOf(user.role)
 }
