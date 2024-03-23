@@ -10,7 +10,6 @@ import {
   getRaceSegments,
   getStravaActivity,
 } from "./strava"
-import { user } from "@nextui-org/react"
 
 declare global {
   interface BigInt {
@@ -394,6 +393,7 @@ export const getResultsForRacePerJersey = async (
     segment_effort: p.segment_efforts?.at(0) || null,
   }))
 }
+
 export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
   return await prisma.user.findMany({
     where: {

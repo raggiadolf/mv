@@ -21,7 +21,7 @@ import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import JerseyTabs from "./JerseyTabs"
 import { Jersey as JerseyType } from "@prisma/client"
-import { differenceInSeconds, format } from "date-fns"
+import { differenceInMinutes, differenceInSeconds, format } from "date-fns"
 import { useUserContext } from "../UserContext"
 import { satisfiesRole } from "../lib/utils"
 
@@ -68,7 +68,11 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
         isFetching={isFetching}
       >
         {data ? (
-          <Table>
+          <Table
+            classNames={{
+              th: ["group-data-[first=true]: max-w-[1px]"],
+            }}
+          >
             <TableHeader>
               <TableColumn>Sæti</TableColumn>
               <TableColumn>Nafn</TableColumn>
@@ -83,27 +87,40 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                 )
                 .map((p, i) => (
                   <TableRow key={p.User.id}>
-                    <TableCell>{i + 1}</TableCell>
+                    <TableCell className="max-w-5">
+                      {i === 0 ? (
+                        <Jersey
+                          jersey={selectedTab as JerseyType}
+                          className="h-5 w-5"
+                        />
+                      ) : (
+                        i + 1
+                      )}
+                    </TableCell>
                     <TableCell className="flex items-center">
                       <User
                         avatarProps={{
                           radius: "lg",
                           src: p.User.profile || "",
                         }}
-                        name={p.User.firstname}
+                        name={`${p.User.firstname} ${p.User.lastname}`}
                       />
-                      {p.jerseys.map((j) => (
-                        <Jersey key={j} jersey={j} className="h-4 w-4" />
-                      ))}
                     </TableCell>
                     <TableCell>
                       {p.segment_effort
                         ? i === 0
-                          ? format(p.segment_effort.end_date, "HH:MM")
-                          : differenceInSeconds(
+                          ? `-`
+                          : `+ ${differenceInMinutes(
                               p.segment_effort.end_date,
                               data?.at(0)?.segment_effort?.end_date || 0
                             )
+                              .toString()
+                              .padStart(2, "0")}:${differenceInSeconds(
+                              p.segment_effort.end_date,
+                              data?.at(0)?.segment_effort?.end_date || 0
+                            )
+                              .toString()
+                              .padStart(2, "0")}`
                         : null}
                     </TableCell>
                   </TableRow>
