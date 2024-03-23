@@ -5,7 +5,12 @@ import { generateId } from "lucia"
 import { Jersey } from "@prisma/client"
 import { getHours, getISODay } from "date-fns"
 import { strava } from "../lib/auth"
-import { getRaceSegments, getStravaActivity } from "./strava"
+import {
+  findActivitiesForUser,
+  getRaceSegments,
+  getStravaActivity,
+} from "./strava"
+import { user } from "@nextui-org/react"
 
 declare global {
   interface BigInt {
@@ -192,9 +197,6 @@ export const createParticipantFromStrava = async (
       strava_activity_id: stravaActivityId,
       segment_efforts: {
         create: segmentEfforts,
-        // connect: segmentEfforts.map((effort) => ({
-        //   id: effort.race_segment_id,
-        // })),
       },
     },
   })
@@ -223,6 +225,46 @@ export const updateParticipant = async (
       },
     },
     data: {
+      strava_activity_id: stravaActivityId,
+      segment_efforts: {
+        deleteMany: {},
+        create: segmentEfforts,
+      },
+    },
+  })
+}
+
+export const upsertParticipant = async (
+  userId: string,
+  raceId: number,
+  segmentEfforts: {
+    strava_segment_id: number
+    elapsed_time_in_seconds: number
+    start_date: Date
+    end_date: Date
+    is_kom: boolean
+    average_watts: number
+    distance_in_meters: number
+    race_segment_id: number
+  }[],
+  stravaActivityId: number
+) => {
+  return await prisma.participant.upsert({
+    where: {
+      race_id_user_id: {
+        race_id: raceId,
+        user_id: userId,
+      },
+    },
+    create: {
+      user_id: userId,
+      race_id: raceId,
+      strava_activity_id: stravaActivityId,
+      segment_efforts: {
+        create: segmentEfforts,
+      },
+    },
+    update: {
       strava_activity_id: stravaActivityId,
       segment_efforts: {
         deleteMany: {},
@@ -633,10 +675,65 @@ export const recalculateResultsForRace = async (raceId: number) => {
     )
     const raceSegmentEfforts = await getRaceSegments(
       activity,
-      race?.ScheduledRace
+      race.ScheduledRace
     )
     await updateParticipant(p.user_id, race.id, raceSegmentEfforts, activity.id)
   }
   // Recalculate jerseys for race with updated participants
+  await calculateJerseysForRace(race.id)
+}
+
+export const refreshAllParticipantsForRace = async (raceId: number) => {
+  const [race, users] = await Promise.all([
+    prisma.race.findFirst({
+      where: {
+        id: raceId,
+      },
+      include: {
+        ScheduledRace: {
+          include: {
+            RaceSegment: true,
+          },
+        },
+      },
+    }),
+    prisma.user.findMany(),
+  ])
+  if (!race) return null // TODO: Throw error
+  for (const user of users) {
+    const tokens: StravaTokens = await strava.refreshAccessToken(
+      user.strava_refresh_token
+    )
+    await updateUserStravaRefreshTokenByUserId(user.id, tokens.refreshToken)
+    const activitySummaries = await findActivitiesForUser(
+      race.date,
+      tokens.accessToken
+    )
+    for (const summary of activitySummaries) {
+      const activity = await getStravaActivity(summary.id, tokens.accessToken)
+      const raceSegmentEfforts = await getRaceSegments(
+        activity,
+        race.ScheduledRace
+      )
+      const YJSegmentId = raceSegmentEfforts.find(
+        (effort) => effort.jersey === "YELLOW"
+      )?.strava_segment_id
+      for (const e of raceSegmentEfforts) {
+        delete e.jersey
+      }
+      if (
+        activity.segment_efforts.some(
+          (se: any) => se.segment.id === YJSegmentId
+        )
+      ) {
+        await upsertParticipant(
+          user.id,
+          race.id,
+          raceSegmentEfforts,
+          activity.id
+        )
+      }
+    }
+  }
   await calculateJerseysForRace(race.id)
 }

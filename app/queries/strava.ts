@@ -1,3 +1,4 @@
+import { Jersey } from "@prisma/client"
 import { addSeconds } from "date-fns"
 
 export const getStravaActivity = async (
@@ -6,6 +7,25 @@ export const getStravaActivity = async (
 ) => {
   const res = await fetch(
     `https://www.strava.com/api/v3/activities/${object_id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  )
+  return await res.json()
+}
+
+export const findActivitiesForUser = async (
+  date: Date,
+  accessToken: string
+) => {
+  const start =
+    new Date(`${date.toISOString().split("T")[0]}T00:00:00Z`).getTime() / 1000
+  const end =
+    new Date(`${date.toISOString().split("T")[0]}T23:59:59Z`).getTime() / 1000
+  const res = await fetch(
+    `https://www.strava.com/api/v3/athlete/activities?after=${start}&before=${end}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -24,6 +44,7 @@ type RaceSegmentEffort = {
   average_watts: number
   distance_in_meters: number
   race_segment_id: number
+  jersey?: Jersey
 }
 export const getRaceSegments = async (
   activity: {
@@ -40,12 +61,13 @@ export const getRaceSegments = async (
     RaceSegment: {
       strava_segment_id: bigint
       id: number
+      jersey: Jersey
     }[]
   }
 ): Promise<RaceSegmentEffort[]> => {
   const rse = activity.segment_efforts.map((se: any) => {
     const scheduledRaceSegment = scheduledRace.RaceSegment.find(
-      (rs: any) => Number(rs.strava_segment_id) === se.segment.id
+      (rs: any) => rs && Number(rs.strava_segment_id) === se.segment.id
     )
     if (scheduledRaceSegment) {
       return {
@@ -57,6 +79,7 @@ export const getRaceSegments = async (
         average_watts: se.average_watts,
         distance_in_meters: se.distance,
         race_segment_id: scheduledRaceSegment.id,
+        jersey: scheduledRaceSegment.jersey,
       }
     }
   })

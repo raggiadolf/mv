@@ -138,11 +138,24 @@ async function recalculateResultsForRace(raceId: number) {
     method: "POST",
   })
 }
+async function refreshRace(raceId: number) {
+  return await fetch(`/race/${raceId}/results/refresh`, {
+    method: "POST",
+  })
+}
 
 function AdminMenu({ raceId }: { raceId: number }) {
   const queryClient = useQueryClient()
   const recalculateMutation = useMutation({
     mutationFn: () => recalculateResultsForRace(raceId),
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({
+        queryKey: ["results", raceId],
+      })
+    },
+  })
+  const refreshRaceMutation = useMutation({
+    mutationFn: () => refreshRace(raceId),
     onSettled: async () => {
       return await queryClient.invalidateQueries({
         queryKey: ["results", raceId],
@@ -158,12 +171,15 @@ function AdminMenu({ raceId }: { raceId: number }) {
       </DropdownTrigger>
       <DropdownMenu
         onAction={(key) => {
-          console.log("key", key)
-          recalculateMutation.mutate()
+          if (key === "rerun_results") recalculateMutation.mutate()
+          else if (key === "refresh_race") refreshRaceMutation.mutate()
         }}
       >
         <DropdownItem key="rerun_results" aria-label="Rerun results">
           <p className="font-semibold">Endurreikna úrslit</p>
+        </DropdownItem>
+        <DropdownItem key="refresh_race" aria-label="Refresh race">
+          <p className="font-semibold">Endurhlaða keppni fyrir alla</p>
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
