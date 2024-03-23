@@ -16,7 +16,7 @@ import {
 import { RaceWithParticipants } from "../lib/db"
 
 import { Jersey } from "./Jerseys"
-import { getFormattedDate, getRelativeDayText } from "../lib/utils"
+import classNames, { getFormattedDate, getRelativeDayText } from "../lib/utils"
 import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import JerseyTabs from "./JerseyTabs"
@@ -162,11 +162,14 @@ function AdminMenu({ raceId }: { raceId: number }) {
       })
     },
   })
+  const loading = recalculateMutation.isPending || refreshRaceMutation.isPending
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button isIconOnly variant="light">
-          <SettingsIcon className="h-5 w-5" />
+        <Button isIconOnly variant="light" isDisabled={loading}>
+          <SettingsIcon
+            className={classNames("h-5 w-5", loading ? "animate-spin" : "")}
+          />
         </Button>
       </DropdownTrigger>
       <DropdownMenu
