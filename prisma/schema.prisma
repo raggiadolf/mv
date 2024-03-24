@@ -48,6 +48,8 @@ model User {
   Participant          Participant[]
   Session              Session[]
   eligible_for_old     Boolean       @default(false)
+  created_at           DateTime      @default(now())
+  deleted_at           DateTime?
 }
 
 model SegmentEffort {
