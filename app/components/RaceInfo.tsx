@@ -117,7 +117,7 @@ function ParticipantList({
 }) {
   return (
     <dl className="flex flex-none items-center justify-end">
-      <div className="isolate flex overflow-hidden">
+      <div className="isolate flex -space-x-1">
         <dt className="sr-only">Participants</dt>
         {participants
           .filter((u: any) => u.jersey !== jerseyToHide)
@@ -149,7 +149,7 @@ function UserWithJersey({ user, jersey }: { user: User; jersey: JerseyType }) {
   return (
     <>
       <Image
-        className="relative inline-block rounded-full ring-2 ring-white"
+        className="relative inline-block rounded-full"
         width={35}
         height={35}
         src={user.profile || ""}

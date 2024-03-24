@@ -59,7 +59,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
   })
 
   return (
-    <div className="w-full">
+    <div className="w-full text-white">
       <DateHeader date={race.date} />
       <JerseyTabs
         tabs={tabs}
@@ -143,9 +143,9 @@ function DateHeader({ date }: { date: Date }) {
   const formattedDate = getFormattedDate(date)
   return (
     <div className="flex items-center space-x-1 justify-center mb-4">
-      <p className="text-md font-semibold text-gray-900">{dayText}</p>
-      <p className="text-gray-600 text-sm">{"\u2022"}</p>
-      <p className="text-md text-gray-500">{formattedDate}</p>
+      <p className="text-md font-semibold text-white">{dayText}</p>
+      <p className="text-gray-300 text-sm">{"\u2022"}</p>
+      <p className="text-md text-gray-200">{formattedDate}</p>
     </div>
   )
 }

@@ -25,7 +25,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <Providers>
           <UserContext user={user}>
-            <main className="flex min-h-screen flex-col items-center justify-between bg-gray-100 p-2">
+            <main className="dark flex min-h-screen flex-col items-center justify-between bg-gray-950 p-2">
               {children}
               <NavBar user={user} />
               <SpeedInsights />
