@@ -1,12 +1,12 @@
-import { redirect } from "next/navigation"
-import { validateRequest } from "./lib/auth"
+import { redirect } from "next/navigation";
+import { validateRequest } from "./lib/auth";
 
 export default async function Page() {
-  const { user } = await validateRequest()
+  const { user } = await validateRequest();
   // if (!user) {
   //   return redirect("/login");
   // } else {
-  return redirect("/splash")
+  return redirect("/races");
   // }
   // return (
   //   <main className="flex min-h-screen flex-col items-center justify-between bg-gray-100 p-2">

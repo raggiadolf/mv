@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "../globals.css"
-import { Providers } from "../providers"
-import { validateRequest } from "../lib/auth"
-import NavBar from "../components/Navbar"
+import "./globals.css"
+import { Providers } from "./providers"
+import { validateRequest } from "./lib/auth"
+import NavBar from "./components/Navbar"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import UserContext from "../UserContext"
+import UserContext from "./UserContext"
 
 const inter = Inter({ subsets: ["latin"] })
 

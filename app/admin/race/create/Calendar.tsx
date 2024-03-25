@@ -1,5 +1,5 @@
-"use client"
-import { useEffect, useRef, useState } from "react"
+"use client";
+import { useEffect, useRef, useState } from "react";
 import {
   Button,
   CheckboxGroup,
@@ -16,18 +16,18 @@ import {
   VisuallyHidden,
   useCheckbox,
   useDisclosure,
-} from "@nextui-org/react"
-import { Jersey } from "@/app/components/Jerseys"
+} from "@nextui-org/react";
+import { Jersey } from "@/app/components/Jerseys";
 import {
   createScheduled,
   deleteScheduled,
   updateScheduled,
-} from "@/app/actions"
-import classNames from "@/app/lib/utils"
+} from "@/app/actions";
+import classNames from "@/app/lib/utils";
 
-import type { ScheduledRaceWithSegments } from "@/app/lib/db"
+import type { ScheduledRaceWithSegments } from "@/app/lib/db";
 
-const weekDays = ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"]
+const weekDays = ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"];
 const weekDaysLong = [
   "Mánudagur",
   "Þriðjudagur",
@@ -36,59 +36,59 @@ const weekDaysLong = [
   "Föstudagur",
   "Laugardagur",
   "Sunnudagur",
-]
+];
 
 export default function Calendar({
   schedule,
 }: {
-  schedule: ScheduledRaceWithSegments[]
+  schedule: ScheduledRaceWithSegments[];
 }) {
-  const container = useRef<HTMLDivElement>(null)
-  const [containerWidth, setContainerWidth] = useState(0)
-  const [weekDay, setWeekDay] = useState(5)
-  const { isOpen, onOpen, onOpenChange } = useDisclosure()
+  const container = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [weekDay, setWeekDay] = useState(5);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [openEvent, setOpenEvent] = useState<{
-    action: "create" | "update"
-    id: number
-    title: string
-    weekday: number
-    start_hour: number
-    start_minute: number
+    action: "create" | "update";
+    id: number;
+    title: string;
+    weekday: number;
+    start_hour: number;
+    start_minute: number;
     jerseys: {
-      key: "YELLOW" | "GREEN" | "POLKA" | "OLD"
-      strava_id: number | null
-    }[]
-  } | null>(null)
+      key: "YELLOW" | "GREEN" | "POLKA" | "OLD";
+      strava_id: number | null;
+    }[];
+  } | null>(null);
 
   useEffect(() => {
     if (container.current) {
-      setContainerWidth(container.current.offsetWidth)
+      setContainerWidth(container.current.offsetWidth);
       const getWidth = () => {
-        setContainerWidth(container.current?.offsetWidth || 0)
-      }
-      window.addEventListener("resize", getWidth)
+        setContainerWidth(container.current?.offsetWidth || 0);
+      };
+      window.addEventListener("resize", getWidth);
 
-      return () => window.removeEventListener("resize", getWidth)
+      return () => window.removeEventListener("resize", getWidth);
     }
-  }, [])
+  }, []);
 
   const scheduleWithCalendarSlots = schedule.map((s) => {
-    const daySlot = s.weekday + 1
-    const timeStart = s.start_hour * 12 + 2 + 12 / (60 / s.start_minute)
+    const daySlot = s.weekday + 1;
+    const timeStart = s.start_hour * 12 + 2 + 12 / (60 / s.start_minute);
     return {
       ...s,
       daySlot,
       timeStart,
-    }
-  })
+    };
+  });
 
   const clicked = (e: React.MouseEvent) => {
-    const boundingClientRect = container.current?.getBoundingClientRect()
-    const offsetX = e.clientX - boundingClientRect?.left!
-    const offsetY = e.clientY - boundingClientRect?.top!
-    const day = Math.floor(offsetX / (containerWidth / 7.15))
-    const time = Math.floor(offsetY / (containerWidth / 47))
-  }
+    const boundingClientRect = container.current?.getBoundingClientRect();
+    const offsetX = e.clientX - boundingClientRect?.left!;
+    const offsetY = e.clientY - boundingClientRect?.top!;
+    const day = Math.floor(offsetX / (containerWidth / 7.15));
+    const time = Math.floor(offsetY / (containerWidth / 47));
+  };
 
   return (
     <div className="w-full px-2">
@@ -104,8 +104,8 @@ export default function Calendar({
               start_minute: 10,
               weekday: 0,
               jerseys: [],
-            })
-            onOpen()
+            });
+            onOpen();
           }}
         >
           Bæta við
@@ -359,8 +359,8 @@ export default function Calendar({
                               key: r.jersey,
                               strava_id: Number(r.strava_segment_id),
                             })),
-                          })
-                          onOpen()
+                          });
+                          onOpen();
                         }}
                         key={s.id}
                         className={`relative mt-px flex col-start-${s.daySlot}`}
@@ -405,7 +405,7 @@ export default function Calendar({
                       setOpenEvent({
                         ...openEvent!,
                         title: e.target.value,
-                      })
+                      });
                     }}
                   />
                   <Dropdown>
@@ -423,7 +423,7 @@ export default function Calendar({
                             setOpenEvent({
                               ...openEvent!,
                               weekday: index,
-                            })
+                            });
                           }}
                         >
                           {day}
@@ -444,7 +444,7 @@ export default function Calendar({
                         ...openEvent!,
                         start_hour: parseInt(e.target.value.split(":")[0]),
                         start_minute: parseInt(e.target.value.split(":")[1]),
-                      })
+                      });
                     }}
                   />
                   <div className="flex flex-col">
@@ -462,7 +462,7 @@ export default function Calendar({
                                 openEvent!.jerseys.find((j) => j.key === key)
                                   ?.strava_id || null,
                             })),
-                          })
+                          });
                         }
                       }}
                     >
@@ -488,7 +488,7 @@ export default function Calendar({
                                     ? { ...j, strava_id: parseInt(e) }
                                     : j
                                 ) || [],
-                            })
+                            });
                           }}
                         />
                       </div>
@@ -514,7 +514,7 @@ export default function Calendar({
                                     ? { ...j, strava_id: parseInt(e) }
                                     : j
                                 ) || [],
-                            })
+                            });
                           }}
                         />
                       </div>
@@ -540,7 +540,7 @@ export default function Calendar({
                                     ? { ...j, strava_id: parseInt(e) }
                                     : j
                                 ) || [],
-                            })
+                            });
                           }}
                         />
                       </div>
@@ -566,7 +566,7 @@ export default function Calendar({
                                     ? { ...j, strava_id: parseInt(e) }
                                     : j
                                 ) || [],
-                            })
+                            });
                           }}
                         />
                       </div>
@@ -583,8 +583,8 @@ export default function Calendar({
                     color="danger"
                     variant="bordered"
                     onPress={() => {
-                      deleteScheduled(openEvent!.id)
-                      onClose()
+                      deleteScheduled(openEvent!.id);
+                      onClose();
                     }}
                   >
                     Eyða
@@ -614,8 +614,8 @@ export default function Calendar({
                             strava_segment_id: j.strava_id || 0,
                             jersey: j.key,
                           }))
-                        )
-                    onClose()
+                        );
+                    onClose();
                   }}
                 >
                   Vista
@@ -626,13 +626,13 @@ export default function Calendar({
         </ModalContent>
       </Modal>
     </div>
-  )
+  );
 }
 
 const CustomCheckbox = (props: any) => {
   const { isSelected, getBaseProps, getInputProps } = useCheckbox({
     ...props,
-  })
+  });
 
   return (
     <label {...getBaseProps()}>
@@ -647,5 +647,5 @@ const CustomCheckbox = (props: any) => {
         )}
       />
     </label>
-  )
-}
+  );
+};

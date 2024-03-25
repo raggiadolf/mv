@@ -1,8 +1,8 @@
-import RaceCard from "../../components/RaceCard"
-import { getAllRaces } from "../../queries/mv"
+import RaceCard from "../components/RaceCard";
+import { getAllRaces } from "../queries/mv";
 
 export default async function Races() {
-  const races = await getAllRaces()
+  const races = await getAllRaces();
   return (
     <ul role="list" className="space-y-3 w-full max-w-[500px]">
       {races.map((race) => {
@@ -10,8 +10,8 @@ export default async function Races() {
           <li key={race.id}>
             <RaceCard id={race.id} />
           </li>
-        )
+        );
       })}
     </ul>
-  )
+  );
 }
