@@ -12,11 +12,11 @@ model Participant {
   race_id            Int
   user_id            String
   jerseys            Jersey[]
+  strava_activity_id BigInt?
+  jersey_set_at      DateTime?
   Race               Race            @relation(fields: [race_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   User               User            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  strava_activity_id BigInt?
   segment_efforts    SegmentEffort[]
-  jersey_set_at      DateTime?
 
   @@unique([race_id, user_id])
 }
@@ -24,8 +24,8 @@ model Participant {
 model Race {
   id                Int           @id @default(autoincrement())
   date              DateTime      @db.Timestamptz(6)
-  Participant       Participant[]
   scheduled_race_id Int
+  Participant       Participant[]
   ScheduledRace     ScheduledRace @relation(fields: [scheduled_race_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -45,11 +45,11 @@ model User {
   lastname             String?
   profile              String?
   role                 Role          @default(USER)
-  Participant          Participant[]
-  Session              Session[]
   eligible_for_old     Boolean       @default(false)
   created_at           DateTime      @default(now())
   deleted_at           DateTime?
+  Participant          Participant[]
+  Session              Session[]
 }
 
 model SegmentEffort {
@@ -61,10 +61,10 @@ model SegmentEffort {
   is_kom                  Boolean
   average_watts           Float
   distance_in_meters      Float
-  Participant             Participant? @relation(fields: [participantId], references: [id])
   participantId           Int?
-  RaceSegment             RaceSegment? @relation(fields: [race_segment_id], references: [id])
   race_segment_id         Int?
+  Participant             Participant? @relation(fields: [participantId], references: [id])
+  RaceSegment             RaceSegment? @relation(fields: [race_segment_id], references: [id])
 
   @@unique([participantId, race_segment_id])
 }
@@ -74,8 +74,8 @@ model RaceSegment {
   strava_segment_id BigInt
   name              String?
   jersey            Jersey
-  ScheduledRace     ScheduledRace?  @relation(fields: [scheduledRaceId], references: [id])
   scheduledRaceId   Int?
+  ScheduledRace     ScheduledRace?  @relation(fields: [scheduledRaceId], references: [id])
   SegmentEffort     SegmentEffort[]
 }
 
@@ -86,22 +86,22 @@ model ScheduledRace {
   start_hour   Int
   start_minute Int
   title        String?
-  RaceSegment  RaceSegment[]
   Race         Race[]
+  RaceSegment  RaceSegment[]
 }
 
 enum Jersey {
   YELLOW
+  GREEN
+  POLKA
   OLD
   PINK
-  POLKA
-  GREEN
 }
 
 enum Role {
-  USER
-  ADMIN
   SUPERADMIN
+  ADMIN
+  USER
 }
 
 enum RaceType {
