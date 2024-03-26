@@ -1,4 +1,4 @@
-import { getValidJerseys, isValidJersey } from "@/app/lib/utils"
+import { isValidJersey } from "@/app/lib/utils"
 import { getJerseyInfoForRace } from "@/app/queries/mv"
 import { Jersey } from "@prisma/client"
 import { NextRequest } from "next/server"

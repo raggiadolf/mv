@@ -10,7 +10,9 @@ async function getResults(jersey: string) {
 }
 
 export default function Leaderboard() {
-  const [selectedTab, setSelectedTab] = useState<React.Key>("YELLOW")
+  const [selectedTab, setSelectedTab] = useState<React.Key>(
+    Object.values(Jersey)[0]
+  )
   const tabs = Object.values(Jersey)
 
   const { data, isFetching } = useQuery<

@@ -467,110 +467,36 @@ export default function Calendar({
                         }
                       }}
                     >
-                      <div className="flex">
-                        <CustomCheckbox value="YELLOW" jersey="YELLOW" />
-                        <Input
-                          isDisabled={
-                            !openEvent?.jerseys.find((j) => j.key === "YELLOW")
-                          }
-                          label="Strava ID"
-                          placeholder="12345678"
-                          value={
-                            openEvent?.jerseys
-                              .find((j) => j.key === "YELLOW")
-                              ?.strava_id?.toString() || ""
-                          }
-                          onValueChange={(e: string) => {
-                            setOpenEvent({
-                              ...openEvent!,
-                              jerseys:
-                                openEvent?.jerseys.map((j) =>
-                                  j.key === "YELLOW"
-                                    ? { ...j, strava_id: parseInt(e) }
-                                    : j
-                                ) || [],
-                            })
-                          }}
-                        />
-                      </div>
-                      <div className="flex">
-                        <CustomCheckbox value="OLD" jersey="OLD" />
-                        <Input
-                          isDisabled={
-                            !openEvent?.jerseys.find((j) => j.key === "OLD")
-                          }
-                          label="Strava ID"
-                          placeholder="12345678"
-                          value={
-                            openEvent?.jerseys
-                              .find((j) => j.key === "OLD")
-                              ?.strava_id?.toString() || ""
-                          }
-                          onValueChange={(e: string) => {
-                            setOpenEvent({
-                              ...openEvent!,
-                              jerseys:
-                                openEvent?.jerseys.map((j) =>
-                                  j.key === "OLD"
-                                    ? { ...j, strava_id: parseInt(e) }
-                                    : j
-                                ) || [],
-                            })
-                          }}
-                        />
-                      </div>
-                      <div className="flex">
-                        <CustomCheckbox value="GREEN" jersey="GREEN" />
-                        <Input
-                          isDisabled={
-                            !openEvent?.jerseys.find((j) => j.key === "GREEN")
-                          }
-                          label="Strava ID"
-                          placeholder="12345678"
-                          value={
-                            openEvent?.jerseys
-                              .find((j) => j.key === "GREEN")
-                              ?.strava_id?.toString() || ""
-                          }
-                          onValueChange={(e: string) => {
-                            setOpenEvent({
-                              ...openEvent!,
-                              jerseys:
-                                openEvent?.jerseys.map((j) =>
-                                  j.key === "GREEN"
-                                    ? { ...j, strava_id: parseInt(e) }
-                                    : j
-                                ) || [],
-                            })
-                          }}
-                        />
-                      </div>
-                      <div className="flex">
-                        <CustomCheckbox value="POLKA" jersey="POLKA" />
-                        <Input
-                          isDisabled={
-                            !openEvent?.jerseys.find((j) => j.key === "POLKA")
-                          }
-                          label="Strava ID"
-                          placeholder="12345678"
-                          value={
-                            openEvent?.jerseys
-                              .find((j) => j.key === "POLKA")
-                              ?.strava_id?.toString() || ""
-                          }
-                          onValueChange={(e: string) => {
-                            setOpenEvent({
-                              ...openEvent!,
-                              jerseys:
-                                openEvent?.jerseys.map((j) =>
-                                  j.key === "POLKA"
-                                    ? { ...j, strava_id: parseInt(e) }
-                                    : j
-                                ) || [],
-                            })
-                          }}
-                        />
-                      </div>
+                      {Object.values(JerseyType).map((j) => (
+                        <div className="flex" key={j}>
+                          <CustomCheckbox key={j} value={j} jersey={j} />
+                          <Input
+                            isDisabled={
+                              !openEvent?.jerseys.find(
+                                (jersey) => jersey.key === j
+                              )
+                            }
+                            label="Strava ID"
+                            placeholder="12345678"
+                            value={
+                              openEvent?.jerseys
+                                .find((jersey) => jersey.key === j)
+                                ?.strava_id?.toString() || ""
+                            }
+                            onValueChange={(e: string) => {
+                              setOpenEvent({
+                                ...openEvent!,
+                                jerseys:
+                                  openEvent?.jerseys.map((jersey) =>
+                                    jersey.key === j
+                                      ? { ...jersey, strava_id: parseInt(e) }
+                                      : jersey
+                                  ) || [],
+                              })
+                            }}
+                          />
+                        </div>
+                      ))}
                     </CheckboxGroup>
                   </div>
                 </div>
@@ -641,7 +567,7 @@ const CustomCheckbox = (props: any) => {
         <input {...getInputProps()} />
       </VisuallyHidden>
       <Jersey
-        jersey={props.jersey as "YELLOW" | "GREEN" | "POLKA" | "OLD" | null}
+        jersey={props.jersey as JerseyType}
         className={classNames(
           "w-8 h-8",
           isSelected ? "opacity-100" : "opacity-25"

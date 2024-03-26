@@ -18,7 +18,9 @@ async function getParticipants(id: number) {
 }
 
 export default function RaceInfo({ id }: { id: number }) {
-  const [jerseyToDisplay, setJerseyToDisplay] = useState<JerseyType>("YELLOW")
+  const [jerseyToDisplay, setJerseyToDisplay] = useState<JerseyType>(
+    Object.values(JerseyType)[0]
+  )
   const { data: jerseyInfo, isFetching: isFetchingInfo } = useQuery<{
     time: number
     distance: number
