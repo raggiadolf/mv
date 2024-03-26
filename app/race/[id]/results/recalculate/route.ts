@@ -1,6 +1,6 @@
 import { validateRequest } from "@/app/lib/auth"
 import { satisfiesRole } from "@/app/lib/utils"
-import { recalculateResultsForRace } from "@/app/queries/mv"
+import { recalculateResultsForRace } from "@/app/queries/db"
 import { NextRequest } from "next/server"
 
 export async function POST(

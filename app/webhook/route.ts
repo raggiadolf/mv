@@ -10,7 +10,7 @@ import {
   getScheduledRaceForRaceTime,
   getUserByStravaId,
   updateUserStravaRefreshtokenByStravaId,
-} from "../queries/mv"
+} from "../queries/db"
 import { getRaceSegments, getStravaActivity } from "../queries/strava"
 
 export async function POST(req: Request): Promise<NextResponse> {

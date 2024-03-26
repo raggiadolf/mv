@@ -1,6 +1,6 @@
 import { validateRequest } from "@/app/lib/auth"
 import { satisfiesRole } from "@/app/lib/utils"
-import { refreshAllParticipantsForRace } from "@/app/queries/mv"
+import { refreshAllParticipantsForRace } from "@/app/queries/db"
 import { NextRequest } from "next/server"
 
 export async function POST(

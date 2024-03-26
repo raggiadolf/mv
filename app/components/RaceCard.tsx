@@ -2,7 +2,7 @@ import Link from "next/link"
 
 import { validateRequest } from "../lib/auth"
 import { getFormattedDate, getRelativeDayText } from "../lib/utils"
-import { getRaceById } from "../queries/mv"
+import { getRaceById } from "../queries/db"
 import RaceInfo from "./RaceInfo"
 
 export default async function RaceCard({ id }: { id: number }) {

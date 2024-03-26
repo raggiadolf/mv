@@ -1,5 +1,5 @@
 import { isValidJersey } from "@/app/lib/utils"
-import { getResultsForRacePerJersey } from "@/app/queries/mv"
+import { getResultsForRacePerJersey } from "@/app/queries/db"
 import { Jersey } from "@prisma/client"
 import { NextRequest } from "next/server"
 

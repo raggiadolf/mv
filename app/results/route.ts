@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server"
-import { getNumberOfJerseysForUser } from "../queries/mv"
+import { getNumberOfJerseysForUser } from "../queries/db"
 import { isValidJersey } from "../lib/utils"
 import { Jersey } from "@prisma/client"
 
