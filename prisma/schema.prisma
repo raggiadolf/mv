@@ -49,6 +49,7 @@ model User {
   created_at           DateTime      @default(now())
   deleted_at           DateTime?
   sex                  Sex           @default(M)
+  weight Float?
   Participant          Participant[]
   Session              Session[]
 }
@@ -93,10 +94,10 @@ model ScheduledRace {
 
 enum Jersey {
   YELLOW
-  GREEN
-  POLKA
   OLD
   PINK
+  POLKA
+  GREEN
 }
 
 enum Role {

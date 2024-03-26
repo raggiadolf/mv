@@ -12,9 +12,9 @@ export async function GET(
   const raceId = parseInt(params.id)
 
   if (!isValidJersey(jersey)) {
-    const results = await getJerseyInfoForRace(raceId, jersey as Jersey)
-    return new Response(JSON.stringify(results), { status: 200 })
+    return new Response("Invalid jersey", { status: 400 })
   }
 
-  return new Response("Invalid jersey", { status: 400 })
+  const results = await getJerseyInfoForRace(raceId, jersey as Jersey)
+  return new Response(JSON.stringify(results), { status: 200 })
 }

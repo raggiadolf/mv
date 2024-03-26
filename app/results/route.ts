@@ -8,9 +8,9 @@ export async function GET(request: NextRequest) {
   const jersey = searchParams.get("jersey")
 
   if (!isValidJersey(jersey)) {
-    const results = await getNumberOfJerseysForUser(jersey as Jersey)
-    return new Response(JSON.stringify(results), { status: 200 })
+    return new Response("Invalid jersey", { status: 400 })
   }
 
-  return new Response("Invalid jersey", { status: 400 })
+  const results = await getNumberOfJerseysForUser(jersey as Jersey)
+  return new Response(JSON.stringify(results), { status: 200 })
 }

@@ -10,12 +10,12 @@ export function useUserContext() {
   return useContext(UserCtx)
 }
 
-export default function UserContext({
+export const UserContext = ({
   user,
   children,
 }: {
   user: User | null
   children: React.ReactNode
-}) {
+}) => {
   return <UserCtx.Provider value={{ user }}>{children}</UserCtx.Provider>
 }

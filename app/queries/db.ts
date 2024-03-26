@@ -2,7 +2,7 @@ import { StravaTokens } from "arctic"
 import prisma, { RaceWithScheduledRace } from "../lib/db"
 import { StravaUser } from "../login/strava/callback/route"
 import { generateId } from "lucia"
-import { Jersey, Race, User } from "@prisma/client"
+import { Jersey, User } from "@prisma/client"
 import { getHours, getISODay } from "date-fns"
 import { strava } from "../lib/auth"
 import {
@@ -361,6 +361,7 @@ export const createUser = async (
       lastname: stravaUser.lastname,
       profile: stravaUser.profile,
       sex: stravaUser.sex,
+      weight: stravaUser.weight,
       strava_refresh_token: tokens.refreshToken,
     },
   })
@@ -477,6 +478,7 @@ export const calculateJerseysForRace = async (raceId: number) => {
       User: {
         select: {
           eligible_for_old: true,
+          sex: true,
         },
       },
     },
@@ -490,6 +492,11 @@ export const calculateJerseysForRace = async (raceId: number) => {
             return (
               effort.strava_segment_id === segment.strava_segment_id &&
               p.User.eligible_for_old
+            )
+          } else if (segment.jersey === "PINK") {
+            return (
+              effort.strava_segment_id === segment.strava_segment_id &&
+              p.User.sex === "F"
             )
           }
           return effort.strava_segment_id === segment.strava_segment_id
@@ -709,6 +716,7 @@ export const addUserToRaces = async (user: User) => {
 }
 
 export const refreshAllParticipantsForRace = async (raceId: number) => {
+  console.log(`Refreshing all participants for race ${raceId}`)
   const [race, users] = await Promise.all([
     prisma.race.findFirst({
       where: {
@@ -732,6 +740,7 @@ export const refreshAllParticipantsForRace = async (raceId: number) => {
     await updateUserStravaRefreshTokenByUserId(user.id, tokens.refreshToken)
     await addUserToRace(user, race, tokens.accessToken)
   }
+  console.log(`Finished refreshing all participants for race ${raceId}`)
 }
 
 const addUserToRace = async (
@@ -739,17 +748,21 @@ const addUserToRace = async (
   race: RaceWithScheduledRace,
   accessToken: string
 ) => {
+  console.log(`Trying to add ${user.id} to ${race.id}`)
   const possibleRaceActivities = await findActivitiesForUser(
     race.date,
     accessToken
   )
+  console.log(`Found ${possibleRaceActivities.length} activities for user`)
 
   for (const pra of possibleRaceActivities) {
     const activity = await getStravaActivity(pra.id, accessToken)
+    console.log(`Checking activity ${activity.id}`)
     const raceSegmentEfforts = await getRaceSegments(
       activity,
       race.ScheduledRace
     )
+    console.log(`Race efforts: ${raceSegmentEfforts}`)
     const yellowJerseySegmentId = raceSegmentEfforts.find(
       (effort) => effort.jersey === "YELLOW"
     )?.strava_segment_id
@@ -766,6 +779,8 @@ const addUserToRace = async (
       )
       await upsertParticipant(user.id, race.id, raceSegmentEfforts, activity.id)
       await calculateJerseysForRace(race.id)
+    } else {
+      console.log(`No race segments in ${activity.id}`)
     }
   }
 }

@@ -93,4 +93,5 @@ export interface StravaUser {
   lastname: string
   profile: string
   sex: Sex
+  weight: number
 }
