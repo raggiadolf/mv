@@ -360,6 +360,7 @@ export const createUser = async (
       firstname: stravaUser.firstname,
       lastname: stravaUser.lastname,
       profile: stravaUser.profile,
+      sex: stravaUser.sex,
       strava_refresh_token: tokens.refreshToken,
     },
   })

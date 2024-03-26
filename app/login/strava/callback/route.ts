@@ -2,7 +2,7 @@ import { strava, lucia } from "../../../lib/auth"
 import { cookies } from "next/headers"
 import { OAuth2RequestError } from "arctic"
 
-import type { User } from "@prisma/client"
+import type { Sex, User } from "@prisma/client"
 import {
   createUser,
   getUserByStravaId,
@@ -92,4 +92,5 @@ export interface StravaUser {
   firstname: string
   lastname: string
   profile: string
+  sex: Sex
 }
