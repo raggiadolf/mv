@@ -5,7 +5,7 @@ import { Providers } from "./providers"
 import { validateRequest } from "./lib/auth"
 import NavBar from "./components/Navbar"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import UserContext from "./UserContext"
+import { UserContext } from "./UserContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -41,7 +41,7 @@ export default async function RootLayout({
           <UserContext user={user}>
             <main className="dark flex min-h-screen flex-col items-center justify-between bg-gray-950 p-2">
               {children}
-              {/* <NavBar user={user} /> */}
+              {process.env.NODE_ENV === "development" && <NavBar user={user} />}
               <SpeedInsights />
             </main>
           </UserContext>

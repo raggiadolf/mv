@@ -45,7 +45,7 @@ model User {
   lastname             String?
   profile              String?
   role                 Role          @default(USER)
-  eligible_for_old     Boolean       @default(false)
+  eligible_for_old     Boolean       @default(true)
   created_at           DateTime      @default(now())
   deleted_at           DateTime?
   sex                  Sex           @default(M)
