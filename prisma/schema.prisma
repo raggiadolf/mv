@@ -93,6 +93,7 @@ model ScheduledRace {
 enum Jersey {
   YELLOW
   OLD
+  PINK
   POLKA
   GREEN
 }

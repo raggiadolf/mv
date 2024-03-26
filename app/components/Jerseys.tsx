@@ -1,33 +1,34 @@
+import { Jersey as JerseyType } from "@prisma/client"
+
 export function Jersey({
   jersey,
   className,
 }: {
-  jersey: "YELLOW" | "GREEN" | "POLKA" | "OLD" | null;
-  className?: string;
+  jersey: JerseyType | null
+  className?: string
 }) {
   return (() => {
     switch (jersey) {
       case "YELLOW":
-        return <YellowJersey className={className} />;
+        return <YellowJersey className={className} />
       case "GREEN":
-        return <GreenJersey className={className} />;
+        return <GreenJersey className={className} />
       case "POLKA":
-        return <PolkaDotJersey className={className} />;
+        return <PolkaDotJersey className={className} />
       case "OLD":
-        return <OldJersey className={className} />;
+        return <OldJersey className={className} />
+      case "PINK":
+        return <PinkJersey className={className} />
       default:
-        return null;
+        return null
     }
-  })();
+  })()
 }
 
 export function getAllJerseyIcons({ className }: { className?: string }) {
-  return [
-    <YellowJersey key="YELLOW" className={className} />,
-    <OldJersey key="OLD" className={className} />,
-    <GreenJersey key="GREEN" className={className} />,
-    <PolkaDotJersey key="POLKA" className={className} />,
-  ];
+  return Object.values(JerseyType).map((jersey) => {
+    return <Jersey key={jersey} jersey={jersey} className={className} />
+  })
 }
 
 export function GreenJersey({ className }: { className?: string }) {
@@ -44,7 +45,7 @@ export function GreenJersey({ className }: { className?: string }) {
         d="m10 47 15 40 40-25 10 125h100l10-125 40 25 15-40-50-35h-28a64 64 0 0 1-74 0H60z"
       />
     </svg>
-  );
+  )
 }
 
 export function OldJersey({ className }: { className?: string }) {
@@ -61,7 +62,7 @@ export function OldJersey({ className }: { className?: string }) {
         d="m10 47 15 40 40-25 10 125h100l10-125 40 25 15-40-50-35h-28a64 64 0 0 1-74 0H60z"
       />
     </svg>
-  );
+  )
 }
 
 export function PolkaDotJersey({ className }: { className?: string }) {
@@ -98,7 +99,7 @@ export function PolkaDotJersey({ className }: { className?: string }) {
         }}
       />
     </svg>
-  );
+  )
 }
 
 export function YellowJersey({ className }: { className?: string }) {
@@ -115,7 +116,24 @@ export function YellowJersey({ className }: { className?: string }) {
         d="m10 47 15 40 40-25 10 125h100l10-125 40 25 15-40-50-35h-28a64 64 0 0 1-74 0H60z"
       />
     </svg>
-  );
+  )
+}
+
+export function PinkJersey({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 250 250"
+      className={className}
+    >
+      <path
+        fill="#fca1ff"
+        stroke="#000"
+        d="m10,47 15,40 40-25 10,125h100l10-125 40,25 15-40-50-35H162a64,64 0 0,1-74,0H60z"
+        strokeWidth="3"
+      />
+    </svg>
+  )
 }
 
 export function BlankJersey({ className }: { className?: string }) {
@@ -132,5 +150,5 @@ export function BlankJersey({ className }: { className?: string }) {
         d="m10 47 15 40 40-25 10 125h100l10-125 40 25 15-40-50-35h-28a64 64 0 0 1-74 0H60z"
       />
     </svg>
-  );
+  )
 }
