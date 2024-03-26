@@ -189,7 +189,7 @@ export const createParticipantFromStrava = async (
   }[],
   stravaActivityId?: number
 ) => {
-  return await prisma.participant.create({
+  const participant = await prisma.participant.create({
     data: {
       user_id: userId,
       race_id: raceId,
@@ -199,6 +199,8 @@ export const createParticipantFromStrava = async (
       },
     },
   })
+  await calculateJerseysForRace(raceId)
+  return participant
 }
 
 export const updateParticipant = async (
@@ -216,7 +218,7 @@ export const updateParticipant = async (
   }[],
   stravaActivityId: number
 ) => {
-  return await prisma.participant.update({
+  const participant = await prisma.participant.update({
     where: {
       race_id_user_id: {
         race_id: raceId,
@@ -231,6 +233,8 @@ export const updateParticipant = async (
       },
     },
   })
+  await calculateJerseysForRace(raceId)
+  return participant
 }
 
 export const upsertParticipant = async (
@@ -248,7 +252,7 @@ export const upsertParticipant = async (
   }[],
   stravaActivityId: number
 ) => {
-  return await prisma.participant.upsert({
+  const participant = await prisma.participant.upsert({
     where: {
       race_id_user_id: {
         race_id: raceId,
@@ -271,6 +275,8 @@ export const upsertParticipant = async (
       },
     },
   })
+  await calculateJerseysForRace(raceId)
+  return participant
 }
 
 export const getParticipationByUserForRace = async (
@@ -512,6 +518,15 @@ export const calculateJerseysForRace = async (raceId: number) => {
       await addJerseyToParticipant(bestEffort.participantId!, segment.jersey)
     }
   }
+
+  await prisma.race.update({
+    where: {
+      id: raceId,
+    },
+    data: {
+      updated_at: new Date(),
+    },
+  })
 }
 
 export const addJerseyToParticipant = async (
@@ -778,7 +793,6 @@ const addUserToRace = async (
         `Found race activity for user ${user.id}, adding to race ${race.id}`
       )
       await upsertParticipant(user.id, race.id, raceSegmentEfforts, activity.id)
-      await calculateJerseysForRace(race.id)
     } else {
       console.log(`No race segments in ${activity.id}`)
     }

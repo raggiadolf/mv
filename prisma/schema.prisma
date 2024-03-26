@@ -27,6 +27,7 @@ model Race {
   scheduled_race_id Int
   Participant       Participant[]
   ScheduledRace     ScheduledRace @relation(fields: [scheduled_race_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updated_at        DateTime      @default(now())
 }
 
 model Session {
@@ -49,7 +50,7 @@ model User {
   created_at           DateTime      @default(now())
   deleted_at           DateTime?
   sex                  Sex           @default(M)
-  weight Float?
+  weight               Float?
   Participant          Participant[]
   Session              Session[]
 }
