@@ -1,32 +1,42 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client"
 
 const prismaClientSingleton = () => {
-  return new PrismaClient();
-};
-
-declare global {
-  var prisma: undefined | ReturnType<typeof prismaClientSingleton>;
+  return new PrismaClient()
 }
 
-const prisma = globalThis.prisma ?? prismaClientSingleton();
+declare global {
+  var prisma: undefined | ReturnType<typeof prismaClientSingleton>
+}
 
-export default prisma;
+const prisma = globalThis.prisma ?? prismaClientSingleton()
 
-if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma;
+export default prisma
+
+if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma
 
 /* types */
 export type RaceWithParticipants = Prisma.RaceGetPayload<{
   include: {
     Participant: {
       include: {
-        User: true;
-      };
-    };
-  };
-}>;
+        User: true
+      }
+    }
+  }
+}>
 
 export type ScheduledRaceWithSegments = Prisma.ScheduledRaceGetPayload<{
   include: {
-    RaceSegment: true;
-  };
-}>;
+    RaceSegment: true
+  }
+}>
+
+export type RaceWithScheduledRace = Prisma.RaceGetPayload<{
+  include: {
+    ScheduledRace: {
+      include: {
+        RaceSegment: true
+      }
+    }
+  }
+}>

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { StravaTokens } from "arctic"
 import { strava } from "../lib/auth"
-import { addSeconds } from "date-fns"
 import {
   calculateJerseysForRace,
   createDefaultMVRace,

@@ -1,5 +1,5 @@
 import { Jersey } from "@prisma/client"
-import { addSeconds } from "date-fns"
+import { addSeconds, subHours, addHours } from "date-fns"
 
 export const getStravaActivity = async (
   object_id: number,
@@ -20,10 +20,12 @@ export const findActivitiesForUser = async (
   date: Date,
   accessToken: string
 ) => {
-  const start =
-    new Date(`${date.toISOString().split("T")[0]}T00:00:00Z`).getTime() / 1000
-  const end =
-    new Date(`${date.toISOString().split("T")[0]}T23:59:59Z`).getTime() / 1000
+  const start = subHours(date, 2).getTime() / 1000
+  const end = addHours(date, 1).getTime() / 1000
+  // const start =
+  //   new Date(`${date.toISOString().split("T")[0]}T00:00:00Z`).getTime() / 1000
+  // const end =
+  //   new Date(`${date.toISOString().split("T")[0]}T23:59:59Z`).getTime() / 1000
   const res = await fetch(
     `https://www.strava.com/api/v3/athlete/activities?after=${start}&before=${end}`,
     {

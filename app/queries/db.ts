@@ -1,8 +1,8 @@
 import { StravaTokens } from "arctic"
-import prisma from "../lib/db"
+import prisma, { RaceWithScheduledRace } from "../lib/db"
 import { StravaUser } from "../login/strava/callback/route"
 import { generateId } from "lucia"
-import { Jersey } from "@prisma/client"
+import { Jersey, Race, User } from "@prisma/client"
 import { getHours, getISODay } from "date-fns"
 import { strava } from "../lib/auth"
 import {
@@ -352,7 +352,7 @@ export const createUser = async (
   tokens: StravaTokens
 ) => {
   const userId = generateId(15)
-  return await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       id: userId,
       strava_id: stravaUser.id,
@@ -363,6 +363,9 @@ export const createUser = async (
       strava_refresh_token: tokens.refreshToken,
     },
   })
+  console.log("Created user: ", user.username, user.strava_id)
+  addUserToRaces(user)
+  return user
 }
 
 // RESULTS
@@ -679,8 +682,29 @@ export const recalculateResultsForRace = async (raceId: number) => {
     )
     await updateParticipant(p.user_id, race.id, raceSegmentEfforts, activity.id)
   }
-  // Recalculate jerseys for race with updated participants
-  await calculateJerseysForRace(race.id)
+}
+
+export const addUserToRaces = async (user: User) => {
+  console.log(`Adding user ${user.id} to all races`)
+  const races = await prisma.race.findMany({
+    include: {
+      ScheduledRace: {
+        include: {
+          RaceSegment: true,
+        },
+      },
+    },
+  })
+  if (!races) return // TODO: Throw error
+
+  const tokens: StravaTokens = await strava.refreshAccessToken(
+    user.strava_refresh_token
+  )
+  await updateUserStravaRefreshTokenByUserId(user.id, tokens.refreshToken)
+
+  for (const race of races) {
+    await addUserToRace(user, race, tokens.accessToken)
+  }
 }
 
 export const refreshAllParticipantsForRace = async (raceId: number) => {
@@ -705,35 +729,42 @@ export const refreshAllParticipantsForRace = async (raceId: number) => {
       user.strava_refresh_token
     )
     await updateUserStravaRefreshTokenByUserId(user.id, tokens.refreshToken)
-    const activitySummaries = await findActivitiesForUser(
-      race.date,
-      tokens.accessToken
+    await addUserToRace(user, race, tokens.accessToken)
+  }
+}
+
+const addUserToRace = async (
+  user: User,
+  race: RaceWithScheduledRace,
+  accessToken: string
+) => {
+  const possibleRaceActivities = await findActivitiesForUser(
+    race.date,
+    accessToken
+  )
+
+  for (const pra of possibleRaceActivities) {
+    const activity = await getStravaActivity(pra.id, accessToken)
+    const raceSegmentEfforts = await getRaceSegments(
+      activity,
+      race.ScheduledRace
     )
-    for (const summary of activitySummaries) {
-      const activity = await getStravaActivity(summary.id, tokens.accessToken)
-      const raceSegmentEfforts = await getRaceSegments(
-        activity,
-        race.ScheduledRace
+    const yellowJerseySegmentId = raceSegmentEfforts.find(
+      (effort) => effort.jersey === "YELLOW"
+    )?.strava_segment_id
+    for (const e of raceSegmentEfforts) {
+      delete e.jersey
+    }
+    if (
+      activity.segment_efforts.some(
+        (se: any) => se.segment.id === yellowJerseySegmentId
       )
-      const YJSegmentId = raceSegmentEfforts.find(
-        (effort) => effort.jersey === "YELLOW"
-      )?.strava_segment_id
-      for (const e of raceSegmentEfforts) {
-        delete e.jersey
-      }
-      if (
-        activity.segment_efforts.some(
-          (se: any) => se.segment.id === YJSegmentId
-        )
-      ) {
-        await upsertParticipant(
-          user.id,
-          race.id,
-          raceSegmentEfforts,
-          activity.id
-        )
-      }
+    ) {
+      console.log(
+        `Found race activity for user ${user.id}, adding to race ${race.id}`
+      )
+      await upsertParticipant(user.id, race.id, raceSegmentEfforts, activity.id)
+      await calculateJerseysForRace(race.id)
     }
   }
-  await calculateJerseysForRace(race.id)
 }
