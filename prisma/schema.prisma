@@ -92,9 +92,9 @@ model ScheduledRace {
 
 enum Jersey {
   YELLOW
-  GREEN
-  POLKA
   OLD
+  POLKA
+  GREEN
 }
 
 enum Role {

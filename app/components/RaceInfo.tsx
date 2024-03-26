@@ -163,7 +163,7 @@ function UserWithJersey({ user, jersey }: { user: User; jersey: JerseyType }) {
   )
 }
 
-const jerseyOrder = ["YELLOW", "OLD", "POLKA", "GREEN", null]
+const jerseyOrder = [...Object.values(JerseyType), null]
 const getUsersToDisplay = (participants: any) => {
   const max = 4
   const jerseyUsers = jerseyOrder

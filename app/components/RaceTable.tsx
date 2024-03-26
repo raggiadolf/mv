@@ -33,7 +33,7 @@ async function getResultsForRace(raceId: number, jersey: string) {
 
 export default function RaceTable({ race }: { race: RaceWithParticipants }) {
   const [selectedTab, setSelectedTab] = useState<React.Key>("YELLOW")
-  const tabs = ["YELLOW", "OLD", "GREEN", "POLKA"]
+  const tabs = Object.values(JerseyType)
 
   const { user } = useUserContext()
 

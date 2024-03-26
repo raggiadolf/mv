@@ -1,6 +1,7 @@
 "use client"
 import { Tabs, Tab } from "@nextui-org/react"
 import { Jersey } from "./Jerseys"
+import { Jersey as JerseyType } from "@prisma/client"
 
 export default function JerseyTabs({
   tabs,
@@ -29,12 +30,7 @@ export default function JerseyTabs({
         {tabs.map((tab) => (
           <Tab
             key={tab}
-            title={
-              <Jersey
-                jersey={tab as "YELLOW" | "OLD" | "GREEN" | "POLKA"}
-                className="w-8 h-8"
-              />
-            }
+            title={<Jersey jersey={tab as JerseyType} className="w-8 h-8" />}
           >
             {isFetching ? <p>Sæki niðurstöður...</p> : children}
           </Tab>
