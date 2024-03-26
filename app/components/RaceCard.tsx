@@ -1,6 +1,5 @@
 import Link from "next/link"
 
-import AttendancePill from "./AttendancePill"
 import { validateRequest } from "../lib/auth"
 import { getFormattedDate, getRelativeDayText } from "../lib/utils"
 import { getRaceById } from "../queries/mv"
@@ -25,11 +24,6 @@ export default async function RaceCard({ id }: { id: number }) {
             <RelativeTime date={race.date} />
           </Link>
         </div>
-        {user && (
-          <div className="-mt-3 -mr-3">
-            <AttendancePill userId={user.id} raceId={race.id} />
-          </div>
-        )}
       </div>
       <div className="flex justify-between">
         <RaceInfo id={id} />
