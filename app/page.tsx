@@ -6,7 +6,7 @@ export default async function Page() {
   // if (!user) {
   //   return redirect("/login");
   // } else {
-  return redirect("/splash")
+  return redirect("/races")
   // }
   // return (
   //   <main className="flex min-h-screen flex-col items-center justify-between bg-gray-100 p-2">
