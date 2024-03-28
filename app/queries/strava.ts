@@ -55,6 +55,7 @@ export const getRaceSegments = async (
       elapsed_time: number
       start_date_local: string
       is_kom: boolean
+      kom_rank?: number
       average_watts: number
       distance: number
     }[]
@@ -78,6 +79,7 @@ export const getRaceSegments = async (
         start_date: se.start_date_local,
         end_date: addSeconds(se.start_date_local, se.elapsed_time),
         is_kom: !!se.is_kom,
+        kom_rank: se.kom_rank,
         average_watts: se.average_watts,
         distance_in_meters: se.distance,
         race_segment_id: scheduledRaceSegment.id,

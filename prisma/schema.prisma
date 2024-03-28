@@ -62,6 +62,7 @@ model SegmentEffort {
   start_date              DateTime
   end_date                DateTime
   is_kom                  Boolean
+  kom_rank                Int?
   average_watts           Float
   distance_in_meters      Float
   participantId           Int?

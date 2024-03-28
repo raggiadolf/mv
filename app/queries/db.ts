@@ -183,6 +183,7 @@ export const createParticipantFromStrava = async (
     start_date: Date
     end_date: Date
     is_kom: boolean
+    kom_rank?: number
     average_watts: number
     distance_in_meters: number
     race_segment_id: number
@@ -403,6 +404,75 @@ export const getResultsForRacePerJersey = async (
     strava_activity_id: p.strava_activity_id,
     segment_effort: p.segment_efforts?.at(0) || null,
   }))
+}
+
+const getParticipantCountForRaces = async () => {
+  return await prisma.race.findMany({
+    include: {
+      _count: {
+        select: {
+          Participant: true,
+        },
+      },
+    },
+    orderBy: {
+      Participant: {
+        _count: "desc",
+      },
+    },
+  })
+}
+
+const getYellowJerseysOrderedByTime = async () => {
+  return await prisma.segmentEffort.findMany({
+    where: {
+      RaceSegment: {
+        jersey: "YELLOW",
+      },
+    },
+    orderBy: {
+      elapsed_time_in_seconds: "asc",
+    },
+  })
+}
+
+export const getResultInfoForRace = async (raceId: number) => {
+  const race = await prisma.race.findFirst({
+    where: {
+      id: raceId,
+    },
+  })
+  if (!race) return null // TODO: Throw error and handle gracefully
+  const participants = await prisma.participant.findMany({
+    where: {
+      race_id: raceId,
+    },
+    include: {
+      User: true,
+      segment_efforts: {
+        take: 1,
+        where: {
+          RaceSegment: {
+            jersey: "YELLOW",
+          },
+        },
+      },
+    },
+  })
+  const totalNoOfUsers = await prisma.user.count()
+  const firstFinisher = participants.find((p) => p.jerseys.includes("YELLOW"))
+
+  const fastestSegment = participants.sort(
+    (a, b) =>
+      a.segment_efforts?.at(0)?.elapsed_time_in_seconds ||
+      0 - (b.segment_efforts?.at(0)?.elapsed_time_in_seconds || 0)
+  )
+
+  return {
+    totalNoOfUsers,
+    firstFinisher,
+    fastestSegment,
+  }
 }
 
 export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
