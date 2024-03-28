@@ -406,34 +406,29 @@ export const getResultsForRacePerJersey = async (
   }))
 }
 
-const getParticipantCountForRaces = async () => {
-  return await prisma.race.findMany({
+export const getResultsForRace = async (raceId: number) => {
+  const res = await prisma.participant.findMany({
+    where: {
+      race_id: raceId,
+    },
     include: {
-      _count: {
-        select: {
-          Participant: true,
+      User: true,
+      segment_efforts: {
+        take: 1,
+        where: {
+          RaceSegment: {
+            jersey: "YELLOW",
+          },
         },
       },
     },
-    orderBy: {
-      Participant: {
-        _count: "desc",
-      },
-    },
   })
-}
-
-const getYellowJerseysOrderedByTime = async () => {
-  return await prisma.segmentEffort.findMany({
-    where: {
-      RaceSegment: {
-        jersey: "YELLOW",
-      },
-    },
-    orderBy: {
-      elapsed_time_in_seconds: "asc",
-    },
-  })
+  return res.map((p) => ({
+    User: p.User,
+    jerseys: p.jerseys,
+    strava_activity_id: p.strava_activity_id,
+    segment_effort: p.segment_efforts?.at(0) || null,
+  }))
 }
 
 export const getResultInfoForRace = async (raceId: number) => {

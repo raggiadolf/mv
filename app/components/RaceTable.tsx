@@ -16,10 +16,13 @@ import {
 import { RaceWithParticipants } from "../lib/db"
 
 import { Jersey } from "./Jerseys"
-import classNames, { getFormattedDate, getRelativeDayText } from "../lib/utils"
+import classNames, {
+  formatElapsedTime,
+  getFormattedDate,
+  getRelativeDayText,
+} from "../lib/utils"
 import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import JerseyTabs from "./JerseyTabs"
 import { Jersey as JerseyType } from "@prisma/client"
 import { differenceInMinutes, differenceInSeconds, format } from "date-fns"
 import { useUserContext } from "../UserContext"
@@ -32,10 +35,13 @@ async function getResultsForRace(raceId: number, jersey: string) {
 }
 
 export default function RaceTable({ race }: { race: RaceWithParticipants }) {
-  const [selectedTab, setSelectedTab] = useState<React.Key>(
-    Object.values(JerseyType)[0]
-  )
-  const tabs = Object.values(JerseyType)
+  const [selectedTab, setSelectedTab] = useState<React.Key | null>(null)
+  const tabs = Object.values(JerseyType) // TODO: Filter out jerseys that noone holds
+
+  const handleTabChange = (key: React.Key) => {
+    if (key === selectedTab) setSelectedTab(null)
+    else setSelectedTab(key)
+  }
 
   const { user } = useUserContext()
 
@@ -52,6 +58,8 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
         end_date: string
         is_kom: boolean
         average_watts: number
+        elapsed_time_in_seconds: number
+        distance_in_meters: number
       }
       jerseys: JerseyType[]
     }[]
@@ -60,28 +68,32 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
     queryFn: () => getResultsForRace(race.id, selectedTab as string),
   })
 
+  console.log("data", data)
   return (
     <div className="w-full text-white">
-      <DateHeader date={race.date} />
-      <JerseyTabs
-        tabs={tabs}
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
-        isFetching={isFetching}
-      >
-        {data ? (
-          <Table
-            classNames={{
-              th: ["group-data-[first=true]: max-w-[1px]"],
-            }}
-          >
-            <TableHeader>
-              <TableColumn>Sæti</TableColumn>
-              <TableColumn>Nafn</TableColumn>
-              <TableColumn>Tími</TableColumn>
-            </TableHeader>
-            <TableBody emptyContent={"Engir þátttakendur"}>
-              {data
+      <div className="flex justify-between items-center px-4 pb-2">
+        <DateHeader date={race.date} />
+        <NewTabs
+          tabs={tabs}
+          selectedTab={selectedTab}
+          setSelectedTab={handleTabChange}
+          isFetching={isFetching}
+        />
+      </div>
+      <Table>
+        <TableHeader>
+          <TableColumn className="text-center">Sæti</TableColumn>
+          <TableColumn>Nafn</TableColumn>
+          <TableColumn>Tími</TableColumn>
+          <TableColumn className="hidden lg:table-cell">Wött</TableColumn>
+        </TableHeader>
+        <TableBody
+          isLoading={isFetching}
+          loadingContent={<div>Hleð...</div>}
+          emptyContent={"Engir þátttakendur"}
+        >
+          {data
+            ? data
                 .sort(
                   (a, b) =>
                     new Date(a.segment_effort?.end_date).getTime() -
@@ -89,48 +101,74 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                 )
                 .map((p, i) => (
                   <TableRow key={p.User.id}>
-                    <TableCell className="max-w-5">
-                      {i === 0 ? (
-                        <Jersey
-                          jersey={selectedTab as JerseyType}
-                          className="h-5 w-5"
-                        />
-                      ) : (
-                        i + 1
-                      )}
-                    </TableCell>
+                    <TableCell className="text-center">{i + 1}</TableCell>
                     <TableCell className="flex items-center">
                       <User
                         avatarProps={{
                           radius: "lg",
                           src: p.User.profile || "",
                         }}
-                        name={`${p.User.firstname} ${p.User.lastname}`}
+                        description={
+                          <div className="flex">
+                            {p.jerseys?.map((jersey) => (
+                              <Jersey
+                                key={jersey}
+                                jersey={jersey}
+                                className="h-4 w-4"
+                              />
+                            ))}
+                          </div>
+                        }
+                        name={p.User.firstname}
                       />
                     </TableCell>
                     <TableCell>
-                      {p.segment_effort
-                        ? i === 0
-                          ? `-`
-                          : `+ ${differenceInMinutes(
-                              p.segment_effort.end_date,
-                              data?.at(0)?.segment_effort?.end_date || 0
-                            )
-                              .toString()
-                              .padStart(2, "0")}:${differenceInSeconds(
-                              p.segment_effort.end_date,
-                              data?.at(0)?.segment_effort?.end_date || 0
-                            )
-                              .toString()
-                              .padStart(2, "0")}`
-                        : null}
+                      <div className="flex flex-col">
+                        <p className="text-sm">
+                          {p.segment_effort
+                            ? i === 0
+                              ? `${formatElapsedTime(
+                                  p.segment_effort.elapsed_time_in_seconds
+                                )}`
+                              : `+ ${differenceInMinutes(
+                                  p.segment_effort.end_date,
+                                  data?.at(0)?.segment_effort?.end_date || 0
+                                )
+                                  .toString()
+                                  .padStart(2, "0")}:${differenceInSeconds(
+                                  p.segment_effort.end_date,
+                                  data?.at(0)?.segment_effort?.end_date || 0
+                                )
+                                  .toString()
+                                  .padStart(2, "0")}`
+                            : null}
+                        </p>
+                        <p className="text-xs font-light">
+                          {`${(
+                            (p.segment_effort?.distance_in_meters /
+                              p.segment_effort?.elapsed_time_in_seconds) *
+                            (18 / 5)
+                          )
+                            .toFixed(1)
+                            .replace(".", ",")} km/klst`}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      <div className="flex flex-col">
+                        <p className="text-sm">
+                          {p.segment_effort?.average_watts
+                            ? `${p.segment_effort.average_watts.toFixed()}`
+                            : `-`}
+                        </p>
+                        <p className="text-xs font-light">avg w</p>
+                      </div>
                     </TableCell>
                   </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        ) : null}
-      </JerseyTabs>
+                ))
+            : []}
+        </TableBody>
+      </Table>
       {satisfiesRole("ADMIN", user) && (
         <div className="flex justify-end">
           <AdminMenu raceId={race.id} />
@@ -143,11 +181,39 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
 function DateHeader({ date }: { date: Date }) {
   const dayText = getRelativeDayText(date)
   const formattedDate = getFormattedDate(date)
+
   return (
-    <div className="flex items-center space-x-1 justify-center mb-4">
-      <p className="text-md font-semibold text-white">{dayText}</p>
-      <p className="text-gray-300 text-sm">{"\u2022"}</p>
+    <div className="flex flex-col justify-center">
+      <p className="text-md font-medium text-white">{dayText}</p>
       <p className="text-md text-gray-200">{formattedDate}</p>
+    </div>
+  )
+}
+
+function NewTabs({
+  tabs,
+  selectedTab,
+  setSelectedTab,
+  isFetching,
+}: {
+  tabs: React.Key[]
+  selectedTab: React.Key | null
+  setSelectedTab: (key: React.Key) => void
+  isFetching: boolean
+}) {
+  return (
+    <div className="space-x-1">
+      {tabs.map((tab) => (
+        <Button
+          isIconOnly
+          key={tab}
+          variant="light"
+          onClick={() => setSelectedTab(tab)}
+          className={classNames(tab === selectedTab ? "bg-default/40" : "")}
+        >
+          <Jersey jersey={tab as JerseyType} className="w-8 h-8" />
+        </Button>
+      ))}
     </div>
   )
 }

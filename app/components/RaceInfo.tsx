@@ -5,6 +5,7 @@ import { Jersey as JerseyType, User } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import { Skeleton, User as NextUIUser } from "@nextui-org/react"
 import {
+  formatElapsedTime,
   getFormattedDate,
   getRelativeDayText,
   withOrdinalSuffix,
@@ -14,14 +15,6 @@ import { ParticipantWithUser } from "../lib/db"
 
 async function getRaceInfo(id: number) {
   return await fetch(`/race/${id}/results/info`).then((res) => res.json())
-}
-
-const formatFinishingTime = (time: number) => {
-  const minutes = ~~(time / 60)
-  const seconds = time % 60
-  return `${minutes.toString().padStart(2, "0")}:${seconds
-    .toString()
-    .padStart(2, "0")}`
 }
 
 export default function RaceInfo({
@@ -81,7 +74,7 @@ export default function RaceInfo({
                 <div className="flex items-center">
                   <ClockIcon className="w-4 h-4 mr-2" />
                   <span className="text-sm font-extralight">
-                    {formatFinishingTime(finishingTime)}
+                    {formatElapsedTime(finishingTime)}
                   </span>
                 </div>
                 <div className="flex items-center">

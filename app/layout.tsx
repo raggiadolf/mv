@@ -41,7 +41,7 @@ export default async function RootLayout({
           <UserContext user={user}>
             <main className="dark flex min-h-screen flex-col items-center justify-between bg-gray-950 p-2">
               {children}
-              {process.env.NODE_ENV === "development" && <NavBar user={user} />}
+              <NavBar user={user} />
               <SpeedInsights />
             </main>
           </UserContext>
