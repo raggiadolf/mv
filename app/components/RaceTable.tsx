@@ -35,8 +35,11 @@ async function getResultsForRace(raceId: number, jersey: string) {
 }
 
 export default function RaceTable({ race }: { race: RaceWithParticipants }) {
+  const availableJerseys = race.Participant.reduce((acc, p) => {
+    return [...acc, ...p.jerseys]
+  }, [] as JerseyType[])
   const [selectedTab, setSelectedTab] = useState<React.Key | null>(null)
-  const tabs = Object.values(JerseyType) // TODO: Filter out jerseys that noone holds
+  const tabs = availableJerseys
 
   const handleTabChange = (key: React.Key) => {
     if (key === selectedTab) setSelectedTab(null)
