@@ -83,7 +83,7 @@ export default function RaceInfo({
                 </div>
               </div>
               <div className="">
-                <div />
+                <div className="h-[20px]" />
                 <div className="flex items-center">
                   <span className="text-sm font-extralight">
                     {kom_rank && withOrdinalSuffix(kom_rank)}
