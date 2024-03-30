@@ -196,7 +196,16 @@ export const createParticipantFromStrava = async (
       race_id: raceId,
       strava_activity_id: stravaActivityId,
       segment_efforts: {
-        create: segmentEfforts,
+        create: segmentEfforts.map((effort) => ({
+          strava_segment_id: effort.strava_segment_id,
+          elapsed_time_in_seconds: effort.elapsed_time_in_seconds,
+          start_date: effort.start_date,
+          end_date: effort.end_date,
+          is_kom: effort.is_kom,
+          average_watts: effort.average_watts,
+          distance_in_meters: effort.distance_in_meters,
+          race_segment_id: effort.race_segment_id,
+        })),
       },
     },
   })
