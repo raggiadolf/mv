@@ -10,6 +10,7 @@ import {
   getRaceSegments,
   getStravaActivity,
 } from "./strava"
+import { addUserToRaceTask } from "./qstash"
 
 declare global {
   interface BigInt {
@@ -136,6 +137,11 @@ export const getRaceById = async (id: number) => {
       Participant: {
         include: {
           User: true,
+        },
+      },
+      ScheduledRace: {
+        include: {
+          RaceSegment: true,
         },
       },
     },
@@ -345,6 +351,14 @@ export const updateUserStravaRefreshTokenByUserId = async (
     },
     data: {
       strava_refresh_token: refreshToken,
+    },
+  })
+}
+
+export const getStravaRefreshToken = async (userId: string) => {
+  return await prisma.user.findUnique({
+    where: {
+      id: userId,
     },
   })
 }
@@ -797,14 +811,8 @@ export const addUserToRaces = async (user: User) => {
     return // TODO: Throw error
   }
 
-  const tokens: StravaTokens = await strava.refreshAccessToken(
-    user.strava_refresh_token
-  )
-  await updateUserStravaRefreshTokenByUserId(user.id, tokens.refreshToken)
-
   for (const race of races) {
-    console.log(`Adding user ${user.id} to ${race.id}`)
-    await addUserToRace(user, race, tokens.accessToken)
+    addUserToRaceTask(user.id, race.id)
   }
 }
 
@@ -836,7 +844,7 @@ export const refreshAllParticipantsForRace = async (raceId: number) => {
   console.log(`Finished refreshing all participants for race ${raceId}`)
 }
 
-const addUserToRace = async (
+export const addUserToRace = async (
   user: User,
   race: RaceWithScheduledRace,
   accessToken: string
