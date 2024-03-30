@@ -803,6 +803,7 @@ export const addUserToRaces = async (user: User) => {
   await updateUserStravaRefreshTokenByUserId(user.id, tokens.refreshToken)
 
   for (const race of races) {
+    console.log(`Adding user ${user.id} to ${race.id}`)
     await addUserToRace(user, race, tokens.accessToken)
   }
 }
