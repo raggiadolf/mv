@@ -382,7 +382,7 @@ export const createUser = async (
     },
   })
   console.log("Created user: ", user.username, user.strava_id)
-  addUserToRaces(user)
+  await addUserToRaces(user)
   return user
 }
 
@@ -792,7 +792,10 @@ export const addUserToRaces = async (user: User) => {
       },
     },
   })
-  if (!races) return // TODO: Throw error
+  if (!races) {
+    console.log("No races to add user to")
+    return // TODO: Throw error
+  }
 
   const tokens: StravaTokens = await strava.refreshAccessToken(
     user.strava_refresh_token

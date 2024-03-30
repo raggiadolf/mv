@@ -50,8 +50,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         )
       } catch (e) {
         console.error("Error creating participant", e)
-        // TODO: Throw error
-        // return NextResponse.json({ received: true });
+        return NextResponse.json({ received: true })
       }
       await calculateJerseysForRace(race.id)
     }
