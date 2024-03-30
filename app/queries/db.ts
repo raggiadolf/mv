@@ -382,7 +382,7 @@ export const createUser = async (
     },
   })
   console.log("Created user: ", user.username, user.strava_id)
-  await addUserToRaces(user)
+  addUserToRaces(user)
   return user
 }
 
