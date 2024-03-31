@@ -1,17 +1,29 @@
 "use client"
 
 import { Jersey } from "./Jerseys"
-import { Jersey as JerseyType, User } from "@prisma/client"
-import { useQuery } from "@tanstack/react-query"
-import { Skeleton, User as NextUIUser } from "@nextui-org/react"
+import { Jersey as JerseyType } from "@prisma/client"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
+  Skeleton,
+  User as NextUIUser,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Listbox,
+  ListboxItem,
+} from "@nextui-org/react"
+import classNames, {
   formatElapsedTime,
   getFormattedDate,
   getRelativeDayText,
+  satisfiesRole,
   withOrdinalSuffix,
 } from "../lib/utils"
 import Link from "next/link"
 import { ParticipantWithUser } from "../lib/db"
+import { useUserContext } from "../UserContext"
 
 async function getRaceInfo(id: number) {
   return await fetch(`/race/${id}/results/info`).then((res) => res.json())
@@ -96,7 +108,7 @@ export default function RaceInfo({
           </div>
           <div className="flex flex-col justify-between">
             <div className="flex justify-end">
-              <JerseyWinners participants={participants} />
+              <JerseyWinners participants={participants} raceId={id} />
             </div>
             <div className="flex justify-end pb-4">
               <ParticipantList participants={participants} />
@@ -110,9 +122,12 @@ export default function RaceInfo({
 
 function JerseyWinners({
   participants,
+  raceId,
 }: {
   participants: ParticipantWithUser[]
+  raceId: number
 }) {
+  const { user } = useUserContext()
   const jerseys = Object.values(JerseyType)
   return (
     <div className="flex space-x-1">
@@ -124,6 +139,9 @@ function JerseyWinners({
               key={jersey}
               participant={participant}
               jersey={jersey}
+              showAdminMenu={satisfiesRole("ADMIN", user)}
+              participants={participants}
+              raceId={raceId}
             />
           )
         }
@@ -171,12 +189,25 @@ function ParticipantList({
 function UserWithJersey({
   participant,
   jersey,
+  showAdminMenu = false,
+  participants,
+  raceId,
 }: {
   participant?: ParticipantWithUser
   jersey: JerseyType
+  showAdminMenu?: boolean
+  participants: ParticipantWithUser[]
+  raceId: number
 }) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure()
   return (
-    <div className="flex relative">
+    <div
+      className={classNames(
+        "flex relative",
+        showAdminMenu ? "cursor-pointer" : "cursor-default"
+      )}
+      onClick={() => onOpen()}
+    >
       <NextUIUser
         className="rounded-full"
         avatarProps={{ src: participant?.User.profile || "", size: "md" }}
@@ -186,7 +217,93 @@ function UserWithJersey({
         className="h-8 w-8 absolute -bottom-2 right-0 block"
         jersey={jersey}
       />
+      <SelectWinnerModal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        participants={participants}
+        jersey={jersey}
+        raceId={raceId}
+      />
     </div>
+  )
+}
+
+async function updateJersey(
+  jersey: JerseyType,
+  participantId: number,
+  raceId: number
+) {
+  return await fetch(`race/${raceId}/jersey`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ jersey, participantId }),
+  })
+}
+
+function SelectWinnerModal({
+  isOpen,
+  onOpenChange,
+  participants,
+  jersey,
+  raceId,
+}: {
+  isOpen: boolean
+  onOpenChange: (isOpen: boolean) => void
+  participants: ParticipantWithUser[]
+  jersey: JerseyType
+  raceId: number
+}) {
+  const jerseyKey = participants.find((p) => p.jerseys.includes(jersey))?.id
+  const disabledKeys = jerseyKey ? [jerseyKey] : []
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: (participantId: number) =>
+      updateJersey(jersey, participantId, raceId),
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({
+        queryKey: ["race", raceId],
+      })
+    },
+  })
+  return (
+    <Modal className="dark" isOpen={isOpen} onOpenChange={onOpenChange}>
+      <ModalContent>
+        <>
+          <ModalHeader className="flex items-center text-white">
+            <p>Veldu sigurvegara fyrir</p>
+            <Jersey className="pl-2 h-8 w-8" jersey={jersey} />
+          </ModalHeader>
+          <ModalBody>
+            <Listbox
+              variant="faded"
+              aria-label="Select a winner for this jersey"
+              onAction={(key) => {
+                mutation.mutate(key as number)
+                onOpenChange(false)
+              }}
+              disabledKeys={disabledKeys}
+            >
+              {participants.map((p) => (
+                <ListboxItem
+                  key={p.id}
+                  startContent={
+                    <NextUIUser
+                      className="rounded-full"
+                      avatarProps={{ src: p.User.profile || "", size: "md" }}
+                      name=""
+                    />
+                  }
+                >
+                  <p className="text-white">{p.User.firstname}</p>
+                </ListboxItem>
+              ))}
+            </Listbox>
+          </ModalBody>
+        </>
+      </ModalContent>
+    </Modal>
   )
 }
 

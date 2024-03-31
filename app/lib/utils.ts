@@ -20,9 +20,9 @@ export function getFormattedDate(date: Date) {
   return format(date, "dd.MM.yyyy")
 }
 
-export function satisfiesRole(role: Role, user: User | null) {
+export function satisfiesRole(role: Role, user: User | null): boolean {
   const roles = Object.values(Role)
-  return user && roles.indexOf(role) <= roles.indexOf(user.role)
+  return !!user && roles.indexOf(role) <= roles.indexOf(user.role)
 }
 
 export function getValidJerseys() {
