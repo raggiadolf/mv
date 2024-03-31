@@ -428,6 +428,13 @@ export const getResultsForRacePerJersey = async (
   const res = await prisma.participant.findMany({
     where: {
       race_id: raceId,
+      segment_efforts: {
+        some: {
+          RaceSegment: {
+            jersey: jersey,
+          },
+        },
+      },
     },
     include: {
       User: true,
