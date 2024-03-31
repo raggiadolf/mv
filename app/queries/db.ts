@@ -595,6 +595,7 @@ export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
 
 export const calculateJerseysForRace = async (raceId: number) => {
   console.log(`Calculating jerseys for ${raceId}`)
+  await removeAllJerseysFromRace(raceId)
   const race = await prisma.race.findFirst({
     where: {
       id: raceId,
@@ -658,6 +659,7 @@ export const calculateJerseysForRace = async (raceId: number) => {
       )
       .at(0)
     if (bestEffort) {
+      console.log(`Adding ${segment.jersey} to ${bestEffort.participantId}`)
       await addJerseyToParticipant(bestEffort.participantId!, segment.jersey)
     }
   }
@@ -762,6 +764,19 @@ export const removeJerseyFromRace = async (raceId: number, jersey: Jersey) => {
       })
     }
   }
+}
+
+export const removeAllJerseysFromRace = async (raceId: number) => {
+  await prisma.participant.updateMany({
+    where: {
+      race_id: raceId,
+    },
+    data: {
+      jerseys: {
+        set: [],
+      },
+    },
+  })
 }
 
 export const getJerseyInfoForRace = async (raceId: number, jersey: Jersey) => {
