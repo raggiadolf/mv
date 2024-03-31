@@ -26,13 +26,6 @@ export default function NavBar({ user }: { user: User | null }) {
         {user ? "Logout" : <StravaIcon />}
       </DropdownItem>,
     ]
-    if (user) {
-      items.unshift(
-        <DropdownItem key="profile" href="/profile" aria-label="Prófíll">
-          Prófill
-        </DropdownItem>
-      )
-    }
     if (user?.role === "ADMIN") {
       items.unshift(
         <DropdownItem
