@@ -11,8 +11,8 @@ import { strava } from "../lib/auth"
 
 async function handler(request: NextRequest) {
   const data = await request.json()
-  console.log("data", data)
   if (!data.userId || !data.raceId || typeof data.userId !== "string") {
+    console.error("Error in data received in qstash handler")
     console.log("data.userId", data.userId)
     console.log("data.raceId", data.raceId)
     console.log("typeof data.userId", typeof data.userId)
@@ -23,7 +23,7 @@ async function handler(request: NextRequest) {
   const race = await getRaceById(data.raceId)
   if (!user || !race) {
     // TODO: Throw error, user or race not found
-    console.log("missing user or race")
+    console.error("missing user or race")
     console.log("user", user)
     console.log("race", race)
     return NextResponse.json({ success: false })
