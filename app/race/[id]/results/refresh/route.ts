@@ -13,6 +13,7 @@ export async function POST(
     return new Response("Unauthorized", { status: 401 })
   }
 
+  console.log("here?")
   await refreshAllParticipantsForRace(raceId)
   return new Response("Refreshed", { status: 200 })
 }

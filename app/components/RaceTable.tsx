@@ -266,10 +266,12 @@ function AdminMenu({ raceId }: { raceId: number }) {
         }}
       >
         <DropdownItem key="rerun_results" aria-label="Rerun results">
-          <p className="font-semibold">Endurreikna úrslit</p>
+          <p className="font-semibold">
+            Endurreikna úrslit fyrir núverandi þátttakendur
+          </p>
         </DropdownItem>
         <DropdownItem key="refresh_race" aria-label="Refresh race">
-          <p className="font-semibold">Endurhlaða keppni fyrir alla</p>
+          <p className="font-semibold">Sækja aftur fyrir alla notendur</p>
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
