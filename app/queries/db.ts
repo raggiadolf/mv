@@ -343,36 +343,54 @@ export const getUserByStravaId = async (stravaId: number) => {
 
 export const updateUserStravaRefreshTokenByUserId = async (
   userId: string,
-  refreshToken: string
+  tokens: StravaTokens
 ) => {
   return await prisma.user.update({
     where: {
       id: userId,
     },
     data: {
-      strava_refresh_token: refreshToken,
+      strava_refresh_token: tokens.refreshToken,
+      strava_access_token: tokens.accessToken,
+      access_token_expires_at: tokens.accessTokenExpiresAt,
     },
   })
 }
 
-export const getStravaRefreshToken = async (userId: string) => {
-  return await prisma.user.findUnique({
+export const getStravaTokens = async (userId: string) => {
+  const user = await prisma.user.findUnique({
     where: {
       id: userId,
     },
   })
+
+  if (!user) return null // TODO: Throw error
+
+  if (user.access_token_expires_at < new Date()) {
+    const tokens = await strava.refreshAccessToken(user.strava_refresh_token)
+    await updateUserStravaRefreshTokenByUserId(user.id, tokens)
+    return tokens
+  }
+
+  return {
+    refreshToken: user.strava_refresh_token,
+    accessToken: user.strava_access_token,
+    accessTokenExpiresAt: user.access_token_expires_at,
+  }
 }
 
 export const updateUserStravaRefreshtokenByStravaId = async (
   stravaId: number,
-  refreshToken: string
+  tokens: StravaTokens
 ) => {
   return await prisma.user.update({
     where: {
       strava_id: stravaId,
     },
     data: {
-      strava_refresh_token: refreshToken,
+      strava_refresh_token: tokens.refreshToken,
+      strava_access_token: tokens.accessToken,
+      access_token_expires_at: tokens.accessTokenExpiresAt,
     },
   })
 }
@@ -393,6 +411,8 @@ export const createUser = async (
       sex: stravaUser.sex,
       weight: stravaUser.weight,
       strava_refresh_token: tokens.refreshToken,
+      strava_access_token: tokens.accessToken,
+      access_token_expires_at: tokens.accessTokenExpiresAt,
     },
   })
   console.log("Created user: ", user.username, user.strava_id)
@@ -779,10 +799,8 @@ export const recalculateResultsForRace = async (raceId: number) => {
 
   // Update each participant with new segment efforts
   for (const p of participants) {
-    const tokens: StravaTokens = await strava.refreshAccessToken(
-      p.User.strava_refresh_token
-    )
-    await updateUserStravaRefreshTokenByUserId(p.User.id, tokens.refreshToken)
+    const tokens = await getStravaTokens(p.user_id)
+    if (!tokens) return // TODO: Throw error
     const activity = await getStravaActivity(
       Number(p.strava_activity_id),
       tokens.accessToken
@@ -835,20 +853,24 @@ export const refreshAllParticipantsForRace = async (raceId: number) => {
   ])
   if (!race) return null // TODO: Throw error
   for (const user of users) {
-    const tokens: StravaTokens = await strava.refreshAccessToken(
-      user.strava_refresh_token
-    )
-    await updateUserStravaRefreshTokenByUserId(user.id, tokens.refreshToken)
-    await addUserToRace(user, race, tokens.accessToken)
+    const tokens = await getStravaTokens(user.id)
+    if (!tokens) return null // TODO: Throw error
+    await addUserToRace(user.id, race, tokens.accessToken)
   }
   console.log(`Finished refreshing all participants for race ${raceId}`)
 }
 
 export const addUserToRace = async (
-  user: User,
+  userId: string,
   race: RaceWithScheduledRace,
   accessToken: string
 ) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  })
+  if (!user) return null // TODO: Throw error
   console.log(`Trying to add ${user.id} to ${race.id}`)
   const possibleRaceActivities = await findActivitiesForUser(
     race.date,

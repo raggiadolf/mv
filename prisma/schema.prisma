@@ -38,21 +38,23 @@ model Session {
 }
 
 model User {
-  id                   String        @id
-  strava_id            Int           @unique
-  strava_refresh_token String
-  username             String
-  firstname            String?
-  lastname             String?
-  profile              String?
-  role                 Role          @default(USER)
-  eligible_for_old     Boolean       @default(true)
-  created_at           DateTime      @default(now())
-  deleted_at           DateTime?
-  sex                  Sex           @default(M)
-  weight               Float?
-  Participant          Participant[]
-  Session              Session[]
+  id                      String        @id
+  strava_id               Int           @unique
+  strava_refresh_token    String
+  strava_access_token     String
+  access_token_expires_at DateTime
+  username                String
+  firstname               String?
+  lastname                String?
+  profile                 String?
+  role                    Role          @default(USER)
+  eligible_for_old        Boolean       @default(true)
+  created_at              DateTime      @default(now())
+  deleted_at              DateTime?
+  sex                     Sex           @default(M)
+  weight                  Float?
+  Participant             Participant[]
+  Session                 Session[]
 }
 
 model SegmentEffort {

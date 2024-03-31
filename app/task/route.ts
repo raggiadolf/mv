@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import {
   addUserToRace,
   getRaceById,
-  getStravaRefreshToken,
+  getStravaTokens,
   updateUserStravaRefreshTokenByUserId,
 } from "../queries/db"
 import { StravaTokens } from "arctic"
@@ -19,20 +19,16 @@ async function handler(request: NextRequest) {
     // TODO: Throw error
     return NextResponse.json({ success: false })
   }
-  const user = await getStravaRefreshToken(data.userId)
+  const tokens = await getStravaTokens(data.userId)
   const race = await getRaceById(data.raceId)
-  if (!user || !race) {
-    // TODO: Throw error, user or race not found
-    console.error("missing user or race")
-    console.log("user", user)
+  if (!tokens || !race) {
+    // TODO: Throw error, user tokens or race not found
+    console.error("missing tokens or race")
+    console.log("user", tokens)
     console.log("race", race)
     return NextResponse.json({ success: false })
   }
-  const tokens: StravaTokens = await strava.refreshAccessToken(
-    user.strava_refresh_token
-  )
-  await updateUserStravaRefreshTokenByUserId(data.userId, tokens.refreshToken)
-  await addUserToRace(user, race, tokens.accessToken)
+  await addUserToRace(data.userId, race, tokens.accessToken)
   return NextResponse.json({ success: true })
 }
 

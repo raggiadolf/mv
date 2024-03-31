@@ -43,10 +43,7 @@ export async function GET(request: Request): Promise<Response> {
         sessionCookie.value,
         sessionCookie.attributes
       )
-      await updateUserStravaRefreshTokenByUserId(
-        existingUser.id,
-        tokens.refreshToken
-      )
+      await updateUserStravaRefreshTokenByUserId(existingUser.id, tokens)
       return new Response(null, {
         status: 302,
         headers: {

@@ -6,11 +6,15 @@ const qstashClient = new Client({
 })
 
 export async function addUserToRaceTask(userId: string, raceId: number) {
-  await qstashClient.publishJSON({
-    url: "https://efb9-213-220-127-112.ngrok-free.app/task",
-    body: {
-      userId,
-      raceId,
-    },
-  })
+  try {
+    await qstashClient.publishJSON({
+      url: process.env.QSTASH_API_URL!,
+      body: {
+        userId,
+        raceId,
+      },
+    })
+  } catch (e) {
+    console.error("Error adding task to qstash", e)
+  }
 }
