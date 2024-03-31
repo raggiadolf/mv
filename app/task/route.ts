@@ -33,7 +33,6 @@ async function handler(request: NextRequest) {
   )
   await updateUserStravaRefreshTokenByUserId(data.userId, tokens.refreshToken)
   await addUserToRace(user, race, tokens.accessToken)
-  // return new Response("Hello, world!", { status: 200 })
   return NextResponse.json({ success: true })
 }
 
