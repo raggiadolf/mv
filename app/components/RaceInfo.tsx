@@ -206,7 +206,7 @@ function UserWithJersey({
         "flex relative",
         showAdminMenu ? "cursor-pointer" : "cursor-default"
       )}
-      onClick={() => onOpen()}
+      onClick={showAdminMenu ? () => onOpen() : undefined}
     >
       <NextUIUser
         className="rounded-full"
