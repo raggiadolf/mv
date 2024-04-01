@@ -9,13 +9,15 @@ export default async function Races() {
   return (
     <>
       <ul role="list" className="space-y-4 w-full max-w-[500px]">
-        {races.map((race) => {
-          return (
-            <li key={race.id}>
-              <RaceCard id={race.id} />
-            </li>
-          )
-        })}
+        {races
+          .filter((r) => r.Participant.length > 0)
+          .map((race) => {
+            return (
+              <li key={race.id}>
+                <RaceCard id={race.id} />
+              </li>
+            )
+          })}
       </ul>
       <WelcomeLoginModal user={user} />
     </>
