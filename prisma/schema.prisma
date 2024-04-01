@@ -43,7 +43,7 @@ model User {
   strava_refresh_token    String
   strava_access_token     String
   access_token_expires_at DateTime
-  username                String
+  username                String?
   firstname               String?
   lastname                String?
   profile                 String?
