@@ -75,35 +75,23 @@ export default function RaceInfo({
                 <RelativeTime date={raceDate} />
               </Link>
             </div>
-            <div className="grid grid-cols-2">
-              <div className="">
-                <div className="flex items-center">
-                  <UsersIcon className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-extralight">
-                    {participants.length}/{raceInfo!.totalNoOfUsers}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <ClockIcon className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-extralight">
-                    {formatElapsedTime(finishingTime)}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <ForwardArrow className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-extralight">{`${finishingSpeed} km/klst`}</span>
-                </div>
+            <div>
+              <div className="flex items-center">
+                <UsersIcon className="w-4 h-4 mr-2" />
+                <span className="text-sm font-extralight">
+                  {participants.length}/{raceInfo!.totalNoOfUsers}
+                </span>
               </div>
-              <div className="">
-                <div className="h-[20px]" />
-                <div className="flex items-center">
-                  <span className="text-sm font-extralight">
-                    {kom_rank && withOrdinalSuffix(kom_rank)}
-                  </span>
-                </div>
-                <div />
+              <div className="flex items-center">
+                <ClockIcon className="w-4 h-4 mr-2" />
+                <span className="text-sm font-extralight">
+                  {formatElapsedTime(finishingTime)}
+                </span>
               </div>
-              <div></div>
+              <div className="flex items-center col-span-2">
+                <ForwardArrow className="w-4 h-4 mr-2" />
+                <span className="text-sm font-extralight">{`${finishingSpeed} km/klst`}</span>
+              </div>
             </div>
           </div>
           <div className="flex flex-col justify-between">

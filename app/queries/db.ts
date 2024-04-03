@@ -208,6 +208,7 @@ export const createParticipantFromStrava = async (
           start_date: effort.start_date,
           end_date: effort.end_date,
           is_kom: effort.is_kom,
+          kom_rank: effort.kom_rank,
           average_watts: effort.average_watts,
           distance_in_meters: effort.distance_in_meters,
           race_segment_id: effort.race_segment_id,
