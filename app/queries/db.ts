@@ -272,6 +272,7 @@ export const upsertParticipant = async (
     start_date: Date
     end_date: Date
     is_kom: boolean
+    kom_rank?: number
     average_watts: number
     distance_in_meters: number
     race_segment_id: number
@@ -296,6 +297,7 @@ export const upsertParticipant = async (
           start_date: effort.start_date,
           end_date: effort.end_date,
           is_kom: effort.is_kom,
+          kom_rank: effort.kom_rank,
           average_watts: effort.average_watts,
           distance_in_meters: effort.distance_in_meters,
           race_segment_id: effort.race_segment_id,
@@ -312,6 +314,7 @@ export const upsertParticipant = async (
           start_date: effort.start_date,
           end_date: effort.end_date,
           is_kom: effort.is_kom,
+          kom_rank: effort.kom_rank,
           average_watts: effort.average_watts,
           distance_in_meters: effort.distance_in_meters,
           race_segment_id: effort.race_segment_id,
@@ -936,7 +939,7 @@ export const addUserToRace = async (
       activity,
       race.ScheduledRace
     )
-    console.log(`Race efforts: ${raceSegmentEfforts}`)
+    console.log(`Race efforts: ${JSON.stringify(raceSegmentEfforts)}`)
     const yellowJerseySegmentId = raceSegmentEfforts.find(
       (effort) => effort.jersey === "YELLOW"
     )?.strava_segment_id

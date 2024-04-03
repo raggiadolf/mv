@@ -6,14 +6,16 @@ export const getStravaActivity = async (
   accessToken: string
 ) => {
   const res = await fetch(
-    `https://www.strava.com/api/v3/activities/${object_id}`,
+    `https://www.strava.com/api/v3/activities/${object_id}?include_all_efforts=true`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     }
   )
-  return await res.json()
+  // TODO: handle errors here before returning
+  const jsonResp = await res.json()
+  return jsonResp
 }
 
 export const findActivitiesForUser = async (
@@ -34,7 +36,9 @@ export const findActivitiesForUser = async (
       },
     }
   )
-  return await res.json()
+  // TODO: handle errors here before returning
+  const jsonResponse = await res.json()
+  return jsonResponse
 }
 
 type RaceSegmentEffort = {

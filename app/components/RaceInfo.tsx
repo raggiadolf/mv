@@ -42,6 +42,7 @@ export default function RaceInfo({
     totalNoOfUsers: number
     firstFinisher: {
       segment_efforts: {
+        strava_segment_id: number
         elapsed_time_in_seconds: number
         distance_in_meters: number
         kom_rank?: number
@@ -62,6 +63,8 @@ export default function RaceInfo({
       ).toFixed(1)
     : 0
   const kom_rank = raceInfo?.firstFinisher?.segment_efforts[0].kom_rank
+  const segment_id =
+    raceInfo?.firstFinisher?.segment_efforts[0].strava_segment_id
 
   return (
     <div>
@@ -87,6 +90,16 @@ export default function RaceInfo({
                 <span className="text-sm font-extralight">
                   {formatElapsedTime(finishingTime)}
                 </span>
+                {kom_rank && (
+                  <a
+                    href={`https://strava.com/segments/${segment_id}`}
+                    className="text-sm font-bold pl-1"
+                  >
+                    {kom_rank === 1
+                      ? "👑"
+                      : ` - ${withOrdinalSuffix(kom_rank)}`}
+                  </a>
+                )}
               </div>
               <div className="flex items-center col-span-2">
                 <ForwardArrow className="w-4 h-4 mr-2" />
