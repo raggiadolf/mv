@@ -65,6 +65,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
         distance_in_meters: number
       }
       jerseys: JerseyType[]
+      strava_activity_id: number
     }[]
   >({
     queryKey: ["results", race.id, selectedTab],
@@ -87,7 +88,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
           <TableColumn className="text-center">Sæti</TableColumn>
           <TableColumn>Nafn</TableColumn>
           <TableColumn>Tími</TableColumn>
-          <TableColumn className="hidden lg:table-cell">Wött</TableColumn>
+          <TableColumn className="hidden md:table-cell">Wött</TableColumn>
         </TableHeader>
         <TableBody
           isLoading={isFetching}
@@ -126,7 +127,11 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <p className="text-sm">
+                        <a
+                          href={`https://strava.com/activities/${p.strava_activity_id}`}
+                          target="_blank"
+                          className="text-sm"
+                        >
                           {p.segment_effort
                             ? i === 0
                               ? `${formatElapsedTime(
@@ -144,7 +149,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                                   .toString()
                                   .padStart(2, "0")}`
                             : null}
-                        </p>
+                        </a>
                         <p className="text-xs font-light">
                           {`${(
                             (p.segment_effort?.distance_in_meters /
@@ -156,7 +161,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell">
+                    <TableCell className="hidden md:table-cell">
                       <div className="flex flex-col">
                         <p className="text-sm">
                           {p.segment_effort?.average_watts

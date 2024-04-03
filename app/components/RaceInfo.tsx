@@ -93,6 +93,7 @@ export default function RaceInfo({
                 {kom_rank && (
                   <a
                     href={`https://strava.com/segments/${segment_id}`}
+                    target="_blank"
                     className="text-sm font-bold pl-1"
                   >
                     {kom_rank === 1
