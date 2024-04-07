@@ -13,8 +13,13 @@ export const getStravaActivity = async (
       },
     }
   )
-  // TODO: handle errors here before returning
+
   const jsonResp = await res.json()
+  if (jsonResp.errors) {
+    console.error("Error fetching activities", jsonResp.errors)
+    // TODO: Find out which user, log it and delete/mark them from db
+    return []
+  }
   return jsonResp
 }
 
@@ -36,9 +41,14 @@ export const findActivitiesForUser = async (
       },
     }
   )
-  // TODO: handle errors here before returning
-  const jsonResponse = await res.json()
-  return jsonResponse
+
+  const jsonResp = await res.json()
+  if (jsonResp.errors) {
+    console.error("Error fetching activities", jsonResp.errors)
+    // TODO: Find out which user, log it and delete/mark them from db
+    return []
+  }
+  return jsonResp
 }
 
 type RaceSegmentEffort = {

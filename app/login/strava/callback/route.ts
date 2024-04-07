@@ -1,4 +1,4 @@
-import { strava, lucia } from "../../../lib/auth"
+import { strava, lucia, STRAVA_SCOPES } from "../../../lib/auth"
 import { cookies } from "next/headers"
 import { OAuth2RequestError } from "arctic"
 
@@ -13,11 +13,21 @@ export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url)
   const code = url.searchParams.get("code")
   const state = url.searchParams.get("state")
+  const scope = url.searchParams.get("scope")
   const storedState = cookies().get("strava_oauth_state")?.value ?? null
   if (!code || !state || !storedState || state !== storedState) {
     return new Response(null, {
       status: 400,
     })
+  }
+
+  // Check scopes
+  for (const requiredScope of STRAVA_SCOPES) {
+    if (!scope?.includes(requiredScope)) {
+      return new Response(null, {
+        status: 400,
+      })
+    }
   }
 
   try {
