@@ -18,6 +18,7 @@ import { RaceWithParticipants } from "../lib/db"
 import { Jersey } from "./Jerseys"
 import classNames, {
   formatElapsedTime,
+  getDifferenceInMinutesAndSeconds,
   getFormattedDate,
   getRelativeDayText,
 } from "../lib/utils"
@@ -72,6 +73,8 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
     queryKey: ["results", race.id, selectedTab],
     queryFn: () => getResultsForRace(race.id, selectedTab as string),
   })
+
+  console.log("data", data)
 
   return (
     <div className="w-full text-white">
@@ -138,17 +141,12 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                               ? `${formatElapsedTime(
                                   p.segment_effort.elapsed_time_in_seconds
                                 )}`
-                              : `+ ${differenceInMinutes(
-                                  p.segment_effort.end_date,
-                                  data?.at(0)?.segment_effort?.end_date || 0
-                                )
-                                  .toString()
-                                  .padStart(2, "0")}:${differenceInSeconds(
-                                  p.segment_effort.end_date,
-                                  data?.at(0)?.segment_effort?.end_date || 0
-                                )
-                                  .toString()
-                                  .padStart(2, "0")}`
+                              : `+ ${getDifferenceInMinutesAndSeconds(
+                                  new Date(p.segment_effort.end_date),
+                                  new Date(
+                                    data?.at(0)?.segment_effort?.end_date || ""
+                                  )
+                                )}`
                             : null}
                         </a>
                         <p className="text-xs font-light">

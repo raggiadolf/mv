@@ -233,7 +233,8 @@ export const updateParticipant = async (
     distance_in_meters: number
     race_segment_id: number
   }[],
-  stravaActivityId: number
+  stravaActivityId: number,
+  updateJerseys = true
 ) => {
   const participant = await prisma.participant.update({
     where: {
@@ -259,7 +260,7 @@ export const updateParticipant = async (
       },
     },
   })
-  await calculateJerseysForRace(raceId)
+  updateJerseys && (await calculateJerseysForRace(raceId))
   return participant
 }
 
@@ -930,8 +931,15 @@ export const recalculateResultsForRace = async (raceId: number) => {
       activity,
       race.ScheduledRace
     )
-    await updateParticipant(p.user_id, race.id, raceSegmentEfforts, activity.id)
+    await updateParticipant(
+      p.user_id,
+      race.id,
+      raceSegmentEfforts,
+      activity.id,
+      false
+    )
   }
+  await calculateJerseysForRace(raceId)
 }
 
 export const addUserToRaces = async (user: User) => {
