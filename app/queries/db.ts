@@ -451,6 +451,32 @@ export const createUser = async (
   return user
 }
 
+export const getAllUsers = async () => {
+  return await prisma.user.findMany()
+}
+
+export const setUserAsOldRider = async (userId: string) => {
+  return await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      eligible_for_old: true,
+    },
+  })
+}
+
+export const setUserAsNotOldRider = async (userId: string) => {
+  return await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      eligible_for_old: false,
+    },
+  })
+}
+
 // RESULTS
 export const getResultsForRacePerJersey = async (
   raceId: number,
@@ -598,7 +624,6 @@ export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
 }
 
 export const getOverAllResults = async () => {
-  console.log("nada")
   const res: any[] = await prisma.$queryRaw`
     SELECT
       u.id,
@@ -618,10 +643,8 @@ export const getOverAllResults = async () => {
     GROUP BY
       u.id, u.profile, u.firstname, u.lastname, u.strava_id
   `
-  console.log("res", res)
 
   const numberOfRaces = await prisma.race.count()
-  console.log("numberOfRaces", numberOfRaces)
 
   return res.map((p: any) => ({
     id: p.id,

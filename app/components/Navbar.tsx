@@ -9,12 +9,21 @@ import {
   DropdownMenu,
   DropdownItem,
   DropdownTrigger,
+  useDisclosure,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalContent,
+  Spinner,
   User as NextUIUser,
 } from "@nextui-org/react"
 import { usePathname } from "next/navigation"
 import classNames from "../lib/utils"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export default function NavBar({ user }: { user: User | null }) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const getDropdownItems = () => {
     const items = [
       <DropdownItem
@@ -36,37 +45,138 @@ export default function NavBar({ user }: { user: User | null }) {
           Búa til viðburð
         </DropdownItem>
       )
+      items.unshift(
+        <DropdownItem key="old-riders" aria-label="Old Riders">
+          Old Riders
+        </DropdownItem>
+      )
     }
 
     return items
   }
   const pathname = usePathname()
   return (
-    <Navbar className="sticky bottom-0">
-      <NavbarContent justify="center" className="w-full space-x-16">
-        <NavbarItem aria-label="races">
-          <Link href="/races">
-            <CalendarIcon isActive={pathname === "/races"} />
-          </Link>
-        </NavbarItem>
-        <NavbarItem aria-label="leaderboard">
-          <Link href="/leaderboard">
-            <TrophyIcon isActive={pathname === "/leaderboard"} />
-          </Link>
-        </NavbarItem>
-        <Dropdown placement="bottom-end" className="dark text-white">
-          <DropdownTrigger>
-            <NextUIUser
-              as="button"
-              className="transition-transform"
-              name=""
-              avatarProps={{ src: user?.profile || "", size: "md" }}
-            />
-          </DropdownTrigger>
-          <DropdownMenu>{getDropdownItems()}</DropdownMenu>
-        </Dropdown>
-      </NavbarContent>
-    </Navbar>
+    <>
+      <Navbar className="sticky bottom-0">
+        <NavbarContent justify="center" className="w-full space-x-16">
+          <NavbarItem aria-label="races">
+            <Link href="/races">
+              <CalendarIcon isActive={pathname === "/races"} />
+            </Link>
+          </NavbarItem>
+          <NavbarItem aria-label="leaderboard">
+            <Link href="/leaderboard">
+              <TrophyIcon isActive={pathname === "/leaderboard"} />
+            </Link>
+          </NavbarItem>
+          <Dropdown placement="bottom-end" className="dark text-white">
+            <DropdownTrigger>
+              <NextUIUser
+                as="button"
+                className="transition-transform"
+                name=""
+                avatarProps={{ src: user?.profile || "", size: "md" }}
+              />
+            </DropdownTrigger>
+            <DropdownMenu
+              onAction={(key) => {
+                if (key === "old-riders") {
+                  onOpen()
+                }
+              }}
+            >
+              {getDropdownItems()}
+            </DropdownMenu>
+          </Dropdown>
+        </NavbarContent>
+      </Navbar>
+      <OldRidersModal isOpen={isOpen} onClose={onOpenChange} />
+    </>
+  )
+}
+
+async function getUsers() {
+  return await fetch("/user").then((res) => res.json())
+}
+
+async function updateOldRiderStatus(payload: Payload) {
+  return await fetch(`/user/${payload.userId}/old`, {
+    method: "PATCH",
+    body: JSON.stringify({ status: payload.status }),
+  }).then((res) => res.json())
+}
+
+type Payload = {
+  userId: string
+  status: "eligible" | "not_eligible"
+}
+
+function OldRidersModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean
+  onClose: () => void
+}) {
+  const queryClient = useQueryClient()
+  const { data, isFetching } = useQuery<User[]>({
+    queryKey: ["user"],
+    queryFn: getUsers,
+    enabled: isOpen,
+  })
+  const mutation = useMutation({
+    mutationFn: (payload: Payload) => updateOldRiderStatus(payload),
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ["user"] })
+    },
+  })
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} className="dark text-white">
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader>Velja Old Riders</ModalHeader>
+            <ModalBody>
+              {isFetching ? (
+                <Spinner />
+              ) : (
+                <div className="space-y-2">
+                  {data
+                    ?.sort((a, b) => {
+                      if (a.firstname! < b.firstname!) return -1
+                      if (a.firstname! > b.firstname!) return 1
+                      return 0
+                    })
+                    .map((user) => (
+                      <div
+                        key={user.id}
+                        className={classNames(
+                          "cursor-pointer",
+                          user.eligible_for_old ? "opacity-100" : "opacity-50"
+                        )}
+                        onClick={() =>
+                          mutation.mutate({
+                            userId: user.id,
+                            status: user.eligible_for_old
+                              ? "eligible"
+                              : "not_eligible",
+                          })
+                        }
+                      >
+                        <NextUIUser
+                          avatarProps={{ src: user.profile || "", size: "lg" }}
+                          name={`${user.firstname} ${user.lastname}`}
+                        />
+                      </div>
+                    ))}
+                </div>
+              )}
+            </ModalBody>
+            <ModalFooter></ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   )
 }
 
