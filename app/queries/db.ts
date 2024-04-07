@@ -597,6 +597,50 @@ export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
   })
 }
 
+export const getOverAllResults = async () => {
+  console.log("nada")
+  const res: any[] = await prisma.$queryRaw`
+    SELECT
+      u.id,
+      u.strava_id,
+      u.profile,
+      u.firstname,
+      u.lastname,
+      COUNT(p) as participation_count,
+      SUM(CASE WHEN 'YELLOW' = ANY(p.jerseys) THEN 1 ELSE 0 END) AS yellow_count,
+      SUM(CASE WHEN 'OLD' = ANY(p.jerseys) THEN 1 ELSE 0 END) AS old_count,
+      SUM(CASE WHEN 'GREEN' = ANY(p.jerseys) THEN 1 ELSE 0 END) AS green_count,
+      SUM(CASE WHEN 'POLKA' = ANY(p.jerseys) THEN 1 ELSE 0 END) AS polka_count,
+      SUM(CASE WHEN 'PINK' = ANY(p.jerseys) THEN 1 ELSE 0 END) AS pink_count
+    FROM
+      "User" u
+      JOIN "Participant" p on u.id = p.user_id
+    GROUP BY
+      u.id, u.profile, u.firstname, u.lastname, u.strava_id
+  `
+  console.log("res", res)
+
+  const numberOfRaces = await prisma.race.count()
+  console.log("numberOfRaces", numberOfRaces)
+
+  return res.map((p: any) => ({
+    id: p.id,
+    strava_id: p.strava_id,
+    profile: p.profile,
+    firstname: p.firstname,
+    lastname: p.lastname,
+    participation_count: Number(p.participation_count),
+    yellow_count: Number(p.yellow_count),
+    old_count: Number(p.old_count),
+    green_count: Number(p.green_count),
+    polka_count: Number(p.polka_count),
+    pink_count: Number(p.pink_count),
+    part_percentage: Math.round(
+      (Number(p.participation_count) / numberOfRaces) * 100
+    ),
+  }))
+}
+
 export const calculateJerseysForRace = async (raceId: number) => {
   console.log(`Calculating jerseys for ${raceId}`)
   await removeAllJerseysFromRace(raceId)

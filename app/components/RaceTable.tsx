@@ -27,6 +27,7 @@ import { Jersey as JerseyType } from "@prisma/client"
 import { differenceInMinutes, differenceInSeconds, format } from "date-fns"
 import { useUserContext } from "../UserContext"
 import { satisfiesRole } from "../lib/utils"
+import NewTabs from "./NewTabs"
 
 async function getResultsForRace(raceId: number, jersey: string) {
   return await fetch(`/race/${raceId}/results?jersey=${jersey}`).then((res) =>
@@ -193,34 +194,6 @@ function DateHeader({ date }: { date: Date }) {
     <div className="flex flex-col justify-center">
       <p className="text-md font-medium text-white">{dayText}</p>
       <p className="text-md text-gray-200">{formattedDate}</p>
-    </div>
-  )
-}
-
-function NewTabs({
-  tabs,
-  selectedTab,
-  setSelectedTab,
-  isFetching,
-}: {
-  tabs: React.Key[]
-  selectedTab: React.Key | null
-  setSelectedTab: (key: React.Key) => void
-  isFetching: boolean
-}) {
-  return (
-    <div className="space-x-1">
-      {tabs.map((tab) => (
-        <Button
-          isIconOnly
-          key={tab}
-          variant="light"
-          onClick={() => setSelectedTab(tab)}
-          className={classNames(tab === selectedTab ? "bg-default/40" : "")}
-        >
-          <Jersey jersey={tab as JerseyType} className="w-8 h-8" />
-        </Button>
-      ))}
     </div>
   )
 }
