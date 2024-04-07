@@ -36,7 +36,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         race = await createDefaultMVRace(new Date(activity.start_date_local))
       }
 
-      const raceSegments = await getRaceSegments(activity, scheduledRace)
+      const raceSegments = await getRaceSegments(activity, scheduledRace, user)
       try {
         await createParticipantFromStrava(
           user.id,

@@ -74,8 +74,6 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
     queryFn: () => getResultsForRace(race.id, selectedTab as string),
   })
 
-  console.log("data", data)
-
   return (
     <div className="w-full text-white">
       <div className="flex justify-between items-center px-4 pb-2">

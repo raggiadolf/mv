@@ -80,26 +80,39 @@ export const getRaceSegments = async (
       id: number
       jersey: Jersey
     }[]
-  }
+  },
+  user: { eligible_for_old: boolean; sex: "M" | "F" }
 ): Promise<RaceSegmentEffort[]> => {
-  const rse = activity.segment_efforts.map((se: any) => {
-    const scheduledRaceSegment = scheduledRace.RaceSegment.find(
-      (rs: any) => rs && Number(rs.strava_segment_id) === se.segment.id
+  const res = []
+  for (const rs of scheduledRace.RaceSegment) {
+    const scheduledRaceSegment = activity.segment_efforts.find(
+      (se: any) => se.segment.id === Number(rs.strava_segment_id)
     )
     if (scheduledRaceSegment) {
-      return {
-        strava_segment_id: se.segment.id,
-        elapsed_time_in_seconds: se.elapsed_time,
-        start_date: se.start_date_local,
-        end_date: addSeconds(se.start_date_local, se.elapsed_time),
-        is_kom: !!se.is_kom,
-        kom_rank: se.kom_rank,
-        average_watts: se.average_watts,
-        distance_in_meters: se.distance,
-        race_segment_id: scheduledRaceSegment.id,
-        jersey: scheduledRaceSegment.jersey,
+      if (
+        (user.eligible_for_old && rs.jersey === "OLD") ||
+        (user.sex === "F" && rs.jersey === "PINK") ||
+        rs.jersey === "YELLOW" ||
+        rs.jersey === "GREEN" ||
+        rs.jersey === "POLKA"
+      ) {
+        res.push({
+          strava_segment_id: Number(rs.strava_segment_id),
+          elapsed_time_in_seconds: scheduledRaceSegment.elapsed_time,
+          start_date: new Date(scheduledRaceSegment.start_date_local),
+          end_date: addSeconds(
+            scheduledRaceSegment.start_date_local,
+            scheduledRaceSegment.elapsed_time
+          ),
+          is_kom: !!scheduledRaceSegment.is_kom,
+          kom_rank: scheduledRaceSegment.kom_rank,
+          average_watts: scheduledRaceSegment.average_watts,
+          distance_in_meters: scheduledRaceSegment.distance,
+          race_segment_id: rs.id,
+          jersey: rs.jersey,
+        })
       }
     }
-  })
-  return rse.filter(Boolean) as RaceSegmentEffort[]
+  }
+  return res
 }

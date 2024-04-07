@@ -929,7 +929,8 @@ export const recalculateResultsForRace = async (raceId: number) => {
     )
     const raceSegmentEfforts = await getRaceSegments(
       activity,
-      race.ScheduledRace
+      race.ScheduledRace,
+      p.User
     )
     await updateParticipant(
       p.user_id,
@@ -1012,7 +1013,8 @@ export const addUserToRace = async (
     console.log(`Checking activity ${activity.id}`)
     const raceSegmentEfforts = await getRaceSegments(
       activity,
-      race.ScheduledRace
+      race.ScheduledRace,
+      user
     )
     console.log(`Race efforts: ${JSON.stringify(raceSegmentEfforts)}`)
     const yellowJerseySegmentId = raceSegmentEfforts.find(
@@ -1030,8 +1032,6 @@ export const addUserToRace = async (
         `Found race activity for user ${user.id}, adding to race ${race.id}`
       )
       await upsertParticipant(user.id, race.id, raceSegmentEfforts, activity.id)
-    } else {
-      console.log(`No race segments in ${activity.id}`)
     }
   }
 }
