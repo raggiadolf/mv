@@ -1,13 +1,6 @@
 import { verifySignatureAppRouter } from "@upstash/qstash/dist/nextjs"
 import { NextRequest, NextResponse } from "next/server"
-import {
-  addUserToRace,
-  getRaceById,
-  getStravaTokens,
-  updateUserStravaRefreshTokenByUserId,
-} from "../queries/db"
-import { StravaTokens } from "arctic"
-import { strava } from "../lib/auth"
+import { addUserToRace, getRaceById, getStravaTokens } from "../queries/db"
 
 async function handler(request: NextRequest) {
   const data = await request.json()

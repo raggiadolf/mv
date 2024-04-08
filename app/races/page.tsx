@@ -10,7 +10,7 @@ export default async function Races() {
     <>
       <ul role="list" className="space-y-4 w-full max-w-[500px]">
         {races
-          .filter((r) => r.Participant.length > 0)
+          // .filter((r) => r.Participant.length > 0)
           .map((race) => {
             return (
               <li key={race.id}>
