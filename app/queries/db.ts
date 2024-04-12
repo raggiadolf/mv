@@ -985,7 +985,7 @@ export const refreshAllParticipantsForRace = async (raceId: number) => {
   for (const user of users) {
     const tokens = await getStravaTokens(user.id)
     if (!tokens) return null // TODO: Throw error
-    await addUserToRace(user.id, race, tokens.accessToken)
+    addUserToRaceTask(user.id, race.id)
   }
   console.log(`Finished refreshing all participants for race ${raceId}`)
 }
