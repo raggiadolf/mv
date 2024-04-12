@@ -770,17 +770,15 @@ export const addJerseyToParticipant = async (
 
   await removeJerseyFromRace(participantJerseys?.race_id, jersey)
 
-  return await prisma.$transaction(async (tx) => {
-    await tx.participant.update({
-      where: {
-        id: participantId,
+  return await prisma.participant.update({
+    where: {
+      id: participantId,
+    },
+    data: {
+      jerseys: {
+        push: jersey,
       },
-      data: {
-        jerseys: {
-          push: jersey,
-        },
-      },
-    })
+    },
   })
 }
 
@@ -987,7 +985,7 @@ export const refreshAllParticipantsForRace = async (raceId: number) => {
   for (const user of users) {
     const tokens = await getStravaTokens(user.id)
     if (!tokens) return null // TODO: Throw error
-    addUserToRaceTask(user.id, race.id)
+    await addUserToRace(user.id, race, tokens.accessToken)
   }
   console.log(`Finished refreshing all participants for race ${raceId}`)
 }
