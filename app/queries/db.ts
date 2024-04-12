@@ -770,15 +770,17 @@ export const addJerseyToParticipant = async (
 
   await removeJerseyFromRace(participantJerseys?.race_id, jersey)
 
-  return await prisma.participant.update({
-    where: {
-      id: participantId,
-    },
-    data: {
-      jerseys: {
-        push: jersey,
+  return await prisma.$transaction(async (tx) => {
+    await tx.participant.update({
+      where: {
+        id: participantId,
       },
-    },
+      data: {
+        jerseys: {
+          push: jersey,
+        },
+      },
+    })
   })
 }
 
