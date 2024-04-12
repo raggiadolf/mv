@@ -50,10 +50,22 @@ export default function NavBar({ user }: { user: User | null }) {
           Old Riders
         </DropdownItem>
       )
+      items.unshift(
+        <DropdownItem key="refresh-all" aria-label="Refresh races">
+          Refresh all races
+        </DropdownItem>
+      )
     }
 
     return items
   }
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: refreshRaces,
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ["races"] })
+    },
+  })
   const pathname = usePathname()
   return (
     <>
@@ -82,6 +94,8 @@ export default function NavBar({ user }: { user: User | null }) {
               onAction={(key) => {
                 if (key === "old-riders") {
                   onOpen()
+                } else if (key === "refresh-all") {
+                  mutation.mutate()
                 }
               }}
             >
@@ -93,6 +107,12 @@ export default function NavBar({ user }: { user: User | null }) {
       <OldRidersModal isOpen={isOpen} onClose={onOpenChange} />
     </>
   )
+}
+
+async function refreshRaces() {
+  return await fetch("/races/refresh", {
+    method: "POST",
+  }).then((res) => res.json())
 }
 
 async function getUsers() {

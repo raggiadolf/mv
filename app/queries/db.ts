@@ -990,6 +990,15 @@ export const refreshAllParticipantsForRace = async (raceId: number) => {
   console.log(`Finished refreshing all participants for race ${raceId}`)
 }
 
+export const refreshAllRaces = async () => {
+  console.log(`Refreshing all races`)
+  const races = await prisma.race.findMany()
+  for (const race of races) {
+    await refreshAllParticipantsForRace(race.id)
+  }
+  console.log(`Finished refreshing all races`)
+}
+
 export const addUserToRace = async (
   userId: string,
   race: RaceWithScheduledRace,
