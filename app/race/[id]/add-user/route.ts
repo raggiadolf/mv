@@ -20,6 +20,7 @@ export async function POST(
   const race = await getRaceById(raceId)
 
   if (!race || !tokens) {
+    console.error(`Error adding user, ${race}, ${tokens}`)
     return new Response("Server error", { status: 500 })
   }
 
