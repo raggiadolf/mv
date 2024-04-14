@@ -453,10 +453,13 @@ export const createUser = async (
 }
 
 export const getAllUsers = async () => {
-  return await prisma.user.findMany()
+  const users = await prisma.user.findMany()
+  console.log("All users", users)
+  return users
 }
 
 export const setUserAsOldRider = async (userId: string) => {
+  console.log(`Setting user ${userId} as old rider`)
   return await prisma.user.update({
     where: {
       id: userId,
@@ -468,6 +471,7 @@ export const setUserAsOldRider = async (userId: string) => {
 }
 
 export const setUserAsNotOldRider = async (userId: string) => {
+  console.log(`Setting user ${userId} as not old rider`)
   return await prisma.user.update({
     where: {
       id: userId,
