@@ -57,6 +57,7 @@ type RaceSegmentEffort = {
   start_date: Date
   end_date: Date
   is_kom: boolean
+  kom_rank?: number
   average_watts: number
   distance_in_meters: number
   race_segment_id: number

@@ -982,11 +982,12 @@ export const refreshAllParticipantsForRace = async (raceId: number) => {
     prisma.user.findMany(),
   ])
   if (!race) return null // TODO: Throw error
-  for (const user of users) {
-    const tokens = await getStravaTokens(user.id)
-    if (!tokens) return null // TODO: Throw error
-    await addUserToRace(user.id, race, tokens.accessToken)
-  }
+  const participants = await Promise.all(
+    users.map((u) => getParticipant(u, race))
+  )
+  console.log("participants", participants.filter(Boolean))
+  await upsertManyParticipants(participants.filter(Boolean) as any)
+  await calculateJerseysForRace(raceId)
   console.log(`Finished refreshing all participants for race ${raceId}`)
 }
 
@@ -997,6 +998,51 @@ export const refreshAllRaces = async () => {
     await refreshAllParticipantsForRace(race.id)
   }
   console.log(`Finished refreshing all races`)
+}
+
+const getParticipant = async (user: User, race: RaceWithScheduledRace) => {
+  const tokens = await getStravaTokens(user.id)
+  if (!tokens) return null // TODO: Throw error
+  console.log(`Fetching possible race activities for ${user.id} for ${race.id}`)
+  const possibleRaceActivities = await findActivitiesForUser(
+    race.date,
+    tokens.accessToken
+  )
+  console.log(`Found ${possibleRaceActivities.length} activities for user`)
+  for (const pra of possibleRaceActivities) {
+    const activity = await getStravaActivity(pra.id, tokens.accessToken)
+    console.log(`Checking activity ${activity.id}`)
+    const raceSegmentEfforts = await getRaceSegments(
+      activity,
+      race.ScheduledRace,
+      user
+    )
+    const yellowJerseySegmentId = raceSegmentEfforts.find(
+      (effort) => effort.jersey === "YELLOW"
+    )?.strava_segment_id
+    if (
+      activity.segment_efforts.some(
+        (se: any) => se.segment.id === yellowJerseySegmentId
+      )
+    ) {
+      return {
+        user_id: user.id,
+        race_id: race.id,
+        strava_activity_id: activity.id,
+        segment_efforts: raceSegmentEfforts.map((effort) => ({
+          strava_segment_id: effort.strava_segment_id,
+          elapsed_time_in_seconds: effort.elapsed_time_in_seconds,
+          start_date: effort.start_date,
+          end_date: effort.end_date,
+          is_kom: effort.is_kom,
+          kom_rank: effort.kom_rank,
+          average_watts: effort.average_watts,
+          distance_in_meters: effort.distance_in_meters,
+          race_segment_id: effort.race_segment_id,
+        })),
+      }
+    }
+  }
 }
 
 export const addUserToRace = async (
@@ -1043,4 +1089,58 @@ export const addUserToRace = async (
       await upsertParticipant(user.id, race.id, raceSegmentEfforts, activity.id)
     }
   }
+}
+
+const upsertManyParticipants = async (
+  participants: {
+    user_id: string
+    race_id: number
+    strava_activity_id: number
+    segment_efforts: {
+      strava_segment_id: number
+      elapsed_time_in_seconds: number
+      start_date: Date
+      end_date: Date
+      is_kom: boolean
+      kom_rank?: number
+      average_watts: number
+      distance_in_meters: number
+      race_segment_id: number
+    }[]
+  }[]
+) => {
+  return await prisma.$transaction([
+    prisma.participant.deleteMany({
+      where: {
+        race_id: {
+          in: participants.map((p) => p.race_id),
+        },
+        user_id: {
+          in: participants.map((p) => p.user_id),
+        },
+      },
+    }),
+    ...participants.map((p) => {
+      return prisma.participant.create({
+        data: {
+          user_id: p.user_id,
+          race_id: p.race_id,
+          strava_activity_id: p.strava_activity_id,
+          segment_efforts: {
+            create: p.segment_efforts.map((effort) => ({
+              strava_segment_id: effort.strava_segment_id,
+              elapsed_time_in_seconds: effort.elapsed_time_in_seconds,
+              start_date: effort.start_date,
+              end_date: effort.end_date,
+              is_kom: effort.is_kom,
+              kom_rank: effort.kom_rank,
+              average_watts: effort.average_watts,
+              distance_in_meters: effort.distance_in_meters,
+              race_segment_id: effort.race_segment_id,
+            })),
+          },
+        },
+      })
+    }),
+  ])
 }
