@@ -5,6 +5,11 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -12,6 +17,7 @@ import {
   TableHeader,
   TableRow,
   User,
+  useDisclosure,
 } from "@nextui-org/react"
 import { RaceWithParticipants } from "../lib/db"
 
@@ -24,8 +30,7 @@ import classNames, {
 } from "../lib/utils"
 import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Jersey as JerseyType } from "@prisma/client"
-import { differenceInMinutes, differenceInSeconds, format } from "date-fns"
+import { Jersey as JerseyType, User as UserType } from "@prisma/client"
 import { useUserContext } from "../UserContext"
 import { satisfiesRole } from "../lib/utils"
 import NewTabs from "./NewTabs"
@@ -204,8 +209,18 @@ async function refreshRace(raceId: number) {
     method: "POST",
   })
 }
+async function addUserToRace(userId: string, raceId: number) {
+  return await fetch(`/race/${raceId}/add-user`, {
+    method: "POST",
+    body: JSON.stringify({ userId }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+}
 
 function AdminMenu({ raceId }: { raceId: number }) {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const queryClient = useQueryClient()
   const recalculateMutation = useMutation({
     mutationFn: () => recalculateResultsForRace(raceId),
@@ -225,30 +240,93 @@ function AdminMenu({ raceId }: { raceId: number }) {
   })
   const loading = recalculateMutation.isPending || refreshRaceMutation.isPending
   return (
-    <Dropdown>
-      <DropdownTrigger>
-        <Button isIconOnly variant="light" isDisabled={loading}>
-          <SettingsIcon
-            className={classNames("h-5 w-5", loading ? "animate-spin" : "")}
-          />
-        </Button>
-      </DropdownTrigger>
-      <DropdownMenu
-        onAction={(key) => {
-          if (key === "rerun_results") recalculateMutation.mutate()
-          else if (key === "refresh_race") refreshRaceMutation.mutate()
-        }}
-      >
-        <DropdownItem key="rerun_results" aria-label="Rerun results">
-          <p className="font-semibold">
-            Endurreikna úrslit fyrir núverandi þátttakendur
-          </p>
-        </DropdownItem>
-        <DropdownItem key="refresh_race" aria-label="Refresh race">
-          <p className="font-semibold">Sækja aftur fyrir alla notendur</p>
-        </DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
+    <>
+      <Dropdown>
+        <DropdownTrigger>
+          <Button isIconOnly variant="light" isDisabled={loading}>
+            <SettingsIcon
+              className={classNames("h-5 w-5", loading ? "animate-spin" : "")}
+            />
+          </Button>
+        </DropdownTrigger>
+        <DropdownMenu
+          onAction={(key) => {
+            if (key === "rerun_results") recalculateMutation.mutate()
+            else if (key === "refresh_race") refreshRaceMutation.mutate()
+            else if (key === "add-user") onOpen()
+          }}
+        >
+          <DropdownItem key="rerun_results" aria-label="Rerun results">
+            <p className="font-semibold">
+              Endurreikna úrslit fyrir núverandi þátttakendur
+            </p>
+          </DropdownItem>
+          <DropdownItem key="refresh_race" aria-label="Refresh race">
+            <p className="font-semibold">Sækja aftur fyrir alla notendur</p>
+          </DropdownItem>
+          <DropdownItem key="add-user" aria-label="Add user">
+            <p className="font-semibold">Bæta við notanda</p>
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+      <AddUserModal isOpen={isOpen} onClose={onOpenChange} raceId={raceId} />
+    </>
+  )
+}
+
+function AddUserModal({
+  raceId,
+  isOpen,
+  onClose,
+}: {
+  raceId: number
+  isOpen: boolean
+  onClose: () => void
+}) {
+  const { data, isFetching } = useQuery<UserType[]>({
+    queryKey: ["users"],
+    queryFn: () => fetch("/user").then((res) => res.json()),
+    enabled: isOpen,
+  })
+  const mutation = useMutation({
+    mutationFn: (data: { userId: string }) =>
+      addUserToRace(data.userId, raceId),
+  })
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} className="dark text-white">
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader>Bæta við notanda</ModalHeader>
+            <ModalBody>
+              {isFetching ? (
+                <Spinner />
+              ) : (
+                <div className="space-y-2">
+                  {data?.map((user) => (
+                    <div key={user.id} className="flex justify-between">
+                      <User
+                        avatarProps={{
+                          radius: "lg",
+                          src: user.profile || "",
+                        }}
+                        name={`${user.firstname} ${user.lastname}`}
+                      />
+                      <Button
+                        onClick={() => mutation.mutate({ userId: user.id })}
+                      >
+                        Bæta við
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ModalBody>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   )
 }
 
