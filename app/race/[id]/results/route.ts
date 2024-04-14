@@ -1,5 +1,5 @@
 import { isValidJersey } from "@/app/lib/utils"
-import { getResultsForRacePerJersey } from "@/app/queries/db"
+import { getResultsForRace, getResultsForRacePerJersey } from "@/app/queries/db"
 import { Jersey } from "@prisma/client"
 import { NextRequest } from "next/server"
 
@@ -8,13 +8,16 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const searchParams = request.nextUrl.searchParams
-  const jersey = searchParams.get("jersey")
+  let jersey = searchParams.get("jersey")
+  if (jersey === "null") jersey = null
   const raceId = parseInt(params.id)
 
-  if (!isValidJersey(jersey)) {
+  if (jersey !== null && !isValidJersey(jersey)) {
     return new Response("Invalid jersey", { status: 400 })
   }
 
-  const results = await getResultsForRacePerJersey(raceId, jersey as Jersey)
+  const results = jersey
+    ? await getResultsForRacePerJersey(raceId, jersey as Jersey)
+    : await getResultsForRace(raceId)
   return new Response(JSON.stringify(results), { status: 200 })
 }

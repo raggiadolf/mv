@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server"
-import { StravaTokens } from "arctic"
-import { strava } from "../lib/auth"
 import {
   calculateJerseysForRace,
   createDefaultMVRace,
   createParticipantFromStrava,
   findRaceOnDate,
   getScheduledRaceForRaceTime,
+  getStravaTokens,
   getUserByStravaId,
-  updateUserStravaRefreshtokenByStravaId,
 } from "../queries/db"
 import { getRaceSegments, getStravaActivity } from "../queries/strava"
 
@@ -21,13 +19,11 @@ export async function POST(req: Request): Promise<NextResponse> {
       console.error("No refresh token found for user", data.owner_id)
       return NextResponse.json({ received: true })
     }
-    const tokens: StravaTokens = await strava.refreshAccessToken(
-      user.strava_refresh_token
-    )
-    await updateUserStravaRefreshtokenByStravaId(
-      parseInt(data.owner_id),
-      tokens.refreshToken
-    )
+    const tokens = await getStravaTokens(user.id)
+    if (!tokens) {
+      console.error("No tokens found for user", data.owner_id)
+      return NextResponse.json({ received: true })
+    }
     const activity = await getStravaActivity(data.object_id, tokens.accessToken)
     const scheduledRace = await getScheduledRaceForRaceTime(
       new Date(activity.start_date_local)
@@ -40,7 +36,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         race = await createDefaultMVRace(new Date(activity.start_date_local))
       }
 
-      const raceSegments = await getRaceSegments(activity, scheduledRace)
+      const raceSegments = await getRaceSegments(activity, scheduledRace, user)
       try {
         await createParticipantFromStrava(
           user.id,
@@ -50,8 +46,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         )
       } catch (e) {
         console.error("Error creating participant", e)
-        // TODO: Throw error
-        // return NextResponse.json({ received: true });
+        return NextResponse.json({ received: true })
       }
       await calculateJerseysForRace(race.id)
     }

@@ -40,3 +40,9 @@ export type RaceWithScheduledRace = Prisma.RaceGetPayload<{
     }
   }
 }>
+
+export type ParticipantWithUser = Prisma.ParticipantGetPayload<{
+  include: {
+    User: true
+  }
+}>

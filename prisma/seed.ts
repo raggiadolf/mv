@@ -1,4 +1,4 @@
-import prisma from "../app/lib/db";
+import prisma from "../app/lib/db"
 
 async function main() {
   // ScheduledRaces
@@ -12,7 +12,7 @@ async function main() {
       start_minute: 10,
       title: "Morgunvakt",
     },
-  });
+  })
   const fridaySegment = await prisma.raceSegment.upsert({
     where: { id: 1 },
     update: {},
@@ -21,7 +21,7 @@ async function main() {
       jersey: "YELLOW",
       scheduledRaceId: fridayRace.id,
     },
-  });
+  })
   // Users
   const jonG = await prisma.user.upsert({
     where: { strava_id: 1 },
@@ -35,8 +35,10 @@ async function main() {
       profile:
         "https://dgalywyr863hv.cloudfront.net/pictures/athletes/34368479/12094008/15/large.jpg",
       strava_refresh_token: "asdf",
+      strava_access_token: "asdf",
+      access_token_expires_at: new Date(),
     },
-  });
+  })
   const ingvar = await prisma.user.upsert({
     where: { strava_id: 2 },
     update: {},
@@ -49,8 +51,10 @@ async function main() {
       profile:
         "https://dgalywyr863hv.cloudfront.net/pictures/athletes/10807/9892/13/large.jpg",
       strava_refresh_token: "asdf",
+      strava_access_token: "asdf",
+      access_token_expires_at: new Date(),
     },
-  });
+  })
   const oskar = await prisma.user.upsert({
     where: { strava_id: 3 },
     update: {},
@@ -63,8 +67,10 @@ async function main() {
       profile:
         "https://dgalywyr863hv.cloudfront.net/pictures/athletes/125100/16169/7/large.jpg",
       strava_refresh_token: "asdf",
+      strava_access_token: "asdf",
+      access_token_expires_at: new Date(),
     },
-  });
+  })
   const thomas = await prisma.user.upsert({
     where: { strava_id: 4 },
     update: {},
@@ -77,8 +83,10 @@ async function main() {
       profile:
         "https://dgalywyr863hv.cloudfront.net/pictures/athletes/9345719/2936658/7/large.jpg",
       strava_refresh_token: "asdf",
+      strava_access_token: "asdf",
+      access_token_expires_at: new Date(),
     },
-  });
+  })
   const eyjo = await prisma.user.upsert({
     where: { strava_id: 5 },
     update: {},
@@ -91,8 +99,10 @@ async function main() {
       profile:
         "https://dgalywyr863hv.cloudfront.net/pictures/athletes/8859398/2693445/7/large.jpg",
       strava_refresh_token: "asdf",
+      strava_access_token: "asdf",
+      access_token_expires_at: new Date(),
     },
-  });
+  })
   const arnarGauti = await prisma.user.upsert({
     where: { strava_id: 6 },
     update: {},
@@ -105,8 +115,10 @@ async function main() {
       profile:
         "https://dgalywyr863hv.cloudfront.net/pictures/athletes/3860912/1246488/7/large.jpg",
       strava_refresh_token: "asdf",
+      strava_access_token: "asdf",
+      access_token_expires_at: new Date(),
     },
-  });
+  })
 
   // Races
   const race1 = await prisma.race.upsert({
@@ -116,7 +128,7 @@ async function main() {
       date: new Date("2023-06-02T06:00:00"),
       scheduled_race_id: fridayRace.id,
     },
-  });
+  })
   const race2 = await prisma.race.upsert({
     where: { id: 2 },
     update: {},
@@ -124,7 +136,7 @@ async function main() {
       date: new Date("2023-06-09T06:00:00"),
       scheduled_race_id: fridayRace.id,
     },
-  });
+  })
   const race3 = await prisma.race.upsert({
     where: { id: 3 },
     update: {},
@@ -132,7 +144,7 @@ async function main() {
       date: new Date("2023-06-16T06:00:00"),
       scheduled_race_id: fridayRace.id,
     },
-  });
+  })
   const race4 = await prisma.race.upsert({
     where: { id: 4 },
     update: {},
@@ -140,7 +152,7 @@ async function main() {
       date: new Date("2023-06-23T06:00:00"),
       scheduled_race_id: fridayRace.id,
     },
-  });
+  })
   const race5 = await prisma.race.upsert({
     where: { id: 5 },
     update: {},
@@ -148,7 +160,7 @@ async function main() {
       date: new Date("2023-06-30T06:00:00"),
       scheduled_race_id: fridayRace.id,
     },
-  });
+  })
 
   // Race Participants
   const participant1 = await prisma.participant.upsert({
@@ -160,7 +172,7 @@ async function main() {
       jerseys: ["POLKA"],
       strava_activity_id: 1234,
     },
-  });
+  })
   const participant2 = await prisma.participant.upsert({
     where: { id: 2 },
     update: {},
@@ -170,7 +182,7 @@ async function main() {
       jerseys: ["YELLOW"],
       strava_activity_id: 1234,
     },
-  });
+  })
   const participant3 = await prisma.participant.upsert({
     where: { id: 3 },
     update: {},
@@ -180,7 +192,7 @@ async function main() {
       jerseys: ["GREEN"],
       strava_activity_id: 1234,
     },
-  });
+  })
   const participant4 = await prisma.participant.upsert({
     where: { id: 4 },
     update: {},
@@ -190,7 +202,7 @@ async function main() {
       jerseys: ["OLD"],
       strava_activity_id: 1234,
     },
-  });
+  })
   const participant5 = await prisma.participant.upsert({
     where: { id: 5 },
     update: {},
@@ -199,7 +211,7 @@ async function main() {
       race_id: race5.id,
       strava_activity_id: 1234,
     },
-  });
+  })
   const participant6 = await prisma.participant.upsert({
     where: { id: 6 },
     update: {},
@@ -208,14 +220,14 @@ async function main() {
       race_id: race5.id,
       strava_activity_id: 1234,
     },
-  });
+  })
 }
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    await prisma.$disconnect()
   })
   .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
