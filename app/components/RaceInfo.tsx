@@ -24,6 +24,7 @@ import classNames, {
 import Link from "next/link"
 import { ParticipantWithUser } from "../lib/db"
 import { useUserContext } from "../UserContext"
+import { useSearchParams } from "next/navigation"
 
 async function getRaceInfo(id: number) {
   return await fetch(`/race/${id}/results/info`).then((res) => res.json())
@@ -38,6 +39,7 @@ export default function RaceInfo({
   participants: ParticipantWithUser[]
   raceDate: Date
 }) {
+  const searchParams = useSearchParams()
   const { data: raceInfo, isFetching: isFetchingRaceInfo } = useQuery<{
     totalNoOfUsers: number
     firstFinisher: {
@@ -74,7 +76,12 @@ export default function RaceInfo({
         <div className="grid grid-cols-2">
           <div className="flex flex-col space-y-6">
             <div>
-              <Link href={`/race/${id}`}>
+              <Link
+                href={{
+                  pathname: `/race/${id}`,
+                  query: searchParams.toString(),
+                }}
+              >
                 <RelativeTime date={raceDate} />
               </Link>
             </div>
@@ -113,7 +120,12 @@ export default function RaceInfo({
               <JerseyWinners participants={participants} raceId={id} />
             </div>
             <div className="flex justify-end pb-4">
-              <Link href={`/race/${id}`}>
+              <Link
+                href={{
+                  pathname: `/race/${id}`,
+                  query: searchParams.toString(),
+                }}
+              >
                 <ParticipantList participants={participants} />
               </Link>
             </div>

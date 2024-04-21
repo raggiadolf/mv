@@ -4,7 +4,6 @@ import {
   Navbar,
   NavbarContent,
   NavbarItem,
-  Link,
   Dropdown,
   DropdownMenu,
   DropdownItem,
@@ -23,6 +22,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import classNames from "../lib/utils"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function NavBar({ user }: { user: User | null }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
@@ -82,7 +82,12 @@ export default function NavBar({ user }: { user: User | null }) {
                 <CalendarIcon isActive={pathname === "/races"} />
               </SeasonDropdown>
             ) : (
-              <Link href={season ? `/races?season=${season}` : "/races"}>
+              <Link
+                href={{
+                  pathname: "/races",
+                  query: season ? { season } : undefined,
+                }}
+              >
                 <CalendarIcon isActive={pathname === "/races"} />
               </Link>
             )}
@@ -94,7 +99,10 @@ export default function NavBar({ user }: { user: User | null }) {
               </SeasonDropdown>
             ) : (
               <Link
-                href={season ? `/leaderboard?season=${season}` : "/leaderboard"}
+                href={{
+                  pathname: "/leaderboard",
+                  query: season ? { season } : undefined,
+                }}
               >
                 <TrophyIcon isActive={pathname === "/leaderboard"} />
               </Link>
@@ -150,8 +158,8 @@ function SeasonDropdown({ children }: { children: React.ReactNode }) {
           router.push(`${pathname}${query}`)
         }}
       >
-        <DropdownItem key="2023">2023</DropdownItem>
         <DropdownItem key="2024">2024</DropdownItem>
+        <DropdownItem key="2023">2023</DropdownItem>
       </DropdownMenu>
     </Dropdown>
   )
