@@ -113,8 +113,18 @@ export const getScheduledRaceForRaceTime = async (date: Date) => {
 }
 
 // RACES
-export const getAllRaces = async () => {
+export const getAllRaces = async (season?: string) => {
   return await prisma.race.findMany({
+    where: {
+      ...(season
+        ? {
+            date: {
+              gte: new Date(`${season}-01-01`),
+              lte: new Date(`${season}-12-31`),
+            },
+          }
+        : {}),
+    },
     orderBy: {
       date: "desc",
     },

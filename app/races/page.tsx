@@ -3,8 +3,14 @@ import RaceCard from "../components/RaceCard"
 import { validateRequest } from "../lib/auth"
 import { getAllRaces } from "../queries/db"
 
-export default async function Races() {
-  const races = await getAllRaces()
+export default async function Races({
+  searchParams,
+}: {
+  searchParams: {
+    season?: string
+  }
+}) {
+  const races = await getAllRaces(searchParams.season)
   const { user } = await validateRequest()
   return (
     <>
