@@ -157,10 +157,10 @@ function ParticipantList({
 }: {
   participants: ParticipantWithUser[]
 }) {
-  const numberfOfParticipantsToShow = 5
-  const participantsWithoutJersey = participants.filter(
-    (p) => p.jerseys.length === 0
-  )
+  const numberfOfParticipantsToShow = 8
+  const participantsWithoutJersey = participants
+    .filter((p) => p.jerseys.length === 0)
+    .slice(0, numberfOfParticipantsToShow)
   const jerseyUsersToAdd = participants
     .filter((p) => p.jerseys.length > 0)
     .slice(0, numberfOfParticipantsToShow - participantsWithoutJersey.length)
