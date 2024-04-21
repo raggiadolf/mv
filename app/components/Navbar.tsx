@@ -71,43 +71,34 @@ export default function NavBar({ user }: { user: User | null }) {
   const pathname = usePathname()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const season = searchParams.get("season")
   return (
     <>
       <Navbar className="sticky bottom-0">
         <NavbarContent justify="center" className="w-full space-x-16">
           <NavbarItem aria-label="races">
             {pathname === "/races" ? (
-              <Dropdown placement="bottom-start" className="dark text-white">
-                <DropdownTrigger>
-                  <Button isIconOnly className="bg-transparent">
-                    <CalendarIcon isActive={pathname === "/races"} />
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  onAction={(key) => {
-                    const current = new URLSearchParams(
-                      Array.from(searchParams.entries())
-                    )
-                    current.set("season", key.toString())
-                    const search = current.toString()
-                    const query = search ? `?${search}` : ""
-                    router.push(`${pathname}${query}`)
-                  }}
-                >
-                  <DropdownItem key="2023">2023</DropdownItem>
-                  <DropdownItem key="2024">2024</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
+              <SeasonDropdown>
+                <CalendarIcon isActive={pathname === "/races"} />
+              </SeasonDropdown>
             ) : (
-              <Link href="/races">
+              <Link href={season ? `/races?season=${season}` : "/races"}>
                 <CalendarIcon isActive={pathname === "/races"} />
               </Link>
             )}
           </NavbarItem>
           <NavbarItem aria-label="leaderboard">
-            <Link href="/leaderboard">
-              <TrophyIcon isActive={pathname === "/leaderboard"} />
-            </Link>
+            {pathname === "/leaderboard" ? (
+              <SeasonDropdown>
+                <TrophyIcon isActive={pathname === "/leaderboard"} />
+              </SeasonDropdown>
+            ) : (
+              <Link
+                href={season ? `/leaderboard?season=${season}` : "/leaderboard"}
+              >
+                <TrophyIcon isActive={pathname === "/leaderboard"} />
+              </Link>
+            )}
           </NavbarItem>
           <Dropdown placement="bottom-end" className="dark text-white">
             <DropdownTrigger>
@@ -134,6 +125,35 @@ export default function NavBar({ user }: { user: User | null }) {
       </Navbar>
       <OldRidersModal isOpen={isOpen} onClose={onOpenChange} />
     </>
+  )
+}
+
+function SeasonDropdown({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  return (
+    <Dropdown placement="bottom-start" className="dark text-white">
+      <DropdownTrigger>
+        <Button isIconOnly className="bg-transparent">
+          {children}
+        </Button>
+      </DropdownTrigger>
+      <DropdownMenu
+        onAction={(key) => {
+          const current = new URLSearchParams(
+            Array.from(searchParams.entries())
+          )
+          current.set("season", key.toString())
+          const search = current.toString()
+          const query = search ? `?${search}` : ""
+          router.push(`${pathname}${query}`)
+        }}
+      >
+        <DropdownItem key="2023">2023</DropdownItem>
+        <DropdownItem key="2024">2024</DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
   )
 }
 
