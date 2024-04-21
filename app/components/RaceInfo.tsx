@@ -113,7 +113,9 @@ export default function RaceInfo({
               <JerseyWinners participants={participants} raceId={id} />
             </div>
             <div className="flex justify-end pb-4">
-              <ParticipantList participants={participants} />
+              <Link href={`/race/${id}`}>
+                <ParticipantList participants={participants} />
+              </Link>
             </div>
           </div>
         </div>
