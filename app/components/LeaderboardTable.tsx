@@ -34,7 +34,7 @@ export default function LeaderboardTable({
       <TableHeader>
         <TableColumn>Nafn</TableColumn>
         <TableColumn className="text-center">Vaktir</TableColumn>
-        <TableColumn className="text-center">Mætingahlutfall</TableColumn>
+        <TableColumn className="text-center">Mæting%</TableColumn>
       </TableHeader>
       <TableBody>
         {participants
@@ -48,7 +48,7 @@ export default function LeaderboardTable({
                         avatarProps={{ radius: "lg", src: p.profile }}
                         name={`${p.firstname} ${p.lastname}`}
                         description={
-                          <div className="flex items-center space-x-1">
+                          <div className="flex items-center space-x-1 max-w-[140px]">
                             {p.yellow_count > 0 && (
                               <>
                                 <p className="text-white">{`${p.yellow_count}x `}</p>
