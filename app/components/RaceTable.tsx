@@ -55,8 +55,8 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
 
   const { user } = useUserContext()
 
-  const { data, isFetching } = useQuery<
-    {
+  const { data, isFetching } = useQuery<{
+    participants: {
       User: {
         id: string
         strava_id: number
@@ -74,10 +74,12 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
       jerseys: JerseyType[]
       strava_activity_id: number
     }[]
-  >({
+    race_type: "RACE" | "GROUPRIDE"
+  }>({
     queryKey: ["results", race.id, selectedTab],
     queryFn: () => getResultsForRace(race.id, selectedTab as string),
   })
+  const isRace = data?.race_type === "RACE"
 
   return (
     <div className="w-full text-white">
@@ -103,7 +105,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
           emptyContent={"Engir þátttakendur"}
         >
           {data
-            ? data
+            ? data.participants
                 .sort(
                   (a, b) =>
                     new Date(a.segment_effort?.end_date).getTime() -
@@ -113,24 +115,30 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                   <TableRow key={p.User.id}>
                     <TableCell className="text-center">{i + 1}</TableCell>
                     <TableCell className="flex items-center">
-                      <User
-                        avatarProps={{
-                          radius: "lg",
-                          src: p.User.profile || "",
-                        }}
-                        description={
-                          <div className="flex">
-                            {p.jerseys?.map((jersey) => (
-                              <Jersey
-                                key={jersey}
-                                jersey={jersey}
-                                className="h-4 w-4"
-                              />
-                            ))}
-                          </div>
-                        }
-                        name={p.User.firstname}
-                      />
+                      <a
+                        href={`https://strava.com/activities/${p.strava_activity_id}`}
+                        target="_blank"
+                        className="text-sm"
+                      >
+                        <User
+                          avatarProps={{
+                            radius: "lg",
+                            src: p.User.profile || "",
+                          }}
+                          description={
+                            <div className="flex">
+                              {p.jerseys?.map((jersey) => (
+                                <Jersey
+                                  key={jersey}
+                                  jersey={jersey}
+                                  className="h-4 w-4"
+                                />
+                              ))}
+                            </div>
+                          }
+                          name={p.User.firstname}
+                        />
+                      </a>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
@@ -139,7 +147,7 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                           target="_blank"
                           className="text-sm"
                         >
-                          {p.segment_effort
+                          {isRace && p.segment_effort
                             ? i === 0
                               ? `${formatElapsedTime(
                                   p.segment_effort.elapsed_time_in_seconds
@@ -147,30 +155,38 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                               : `+ ${getDifferenceInMinutesAndSeconds(
                                   new Date(p.segment_effort.end_date),
                                   new Date(
-                                    data?.at(0)?.segment_effort?.end_date || ""
+                                    data?.participants.at(0)?.segment_effort
+                                      ?.end_date || ""
                                   )
                                 )}`
-                            : null}
+                            : "☕️"}
                         </a>
                         <p className="text-xs font-light">
-                          {`${(
-                            (p.segment_effort?.distance_in_meters /
-                              p.segment_effort?.elapsed_time_in_seconds) *
-                            (18 / 5)
-                          )
-                            .toFixed(1)
-                            .replace(".", ",")} km/klst`}
+                          {isRace &&
+                            `${(
+                              (p.segment_effort?.distance_in_meters /
+                                p.segment_effort?.elapsed_time_in_seconds) *
+                              (18 / 5)
+                            )
+                              .toFixed(1)
+                              .replace(".", ",")} km/klst`}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       <div className="flex flex-col">
-                        <p className="text-sm">
-                          {p.segment_effort?.average_watts
-                            ? `${p.segment_effort.average_watts.toFixed()}`
-                            : `-`}
-                        </p>
-                        <p className="text-xs font-light">avg w</p>
+                        {isRace ? (
+                          <>
+                            <p className="text-sm">
+                              {p.segment_effort?.average_watts
+                                ? `${p.segment_effort.average_watts.toFixed()}`
+                                : `-`}
+                            </p>
+                            <p className="text-xs font-light">avg w</p>
+                          </>
+                        ) : (
+                          <p className="text-sm">💆</p>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

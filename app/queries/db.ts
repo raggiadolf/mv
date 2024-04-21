@@ -528,6 +528,14 @@ export const getResultsForRacePerJersey = async (
 }
 
 export const getResultsForRace = async (raceId: number) => {
+  const race = await prisma.race.findFirst({
+    where: {
+      id: raceId,
+    },
+    include: {
+      ScheduledRace: true,
+    },
+  })
   const res = await prisma.participant.findMany({
     where: {
       race_id: raceId,
@@ -542,14 +550,22 @@ export const getResultsForRace = async (raceId: number) => {
           },
         },
       },
+      Race: {
+        include: {
+          ScheduledRace: true,
+        },
+      },
     },
   })
-  return res.map((p) => ({
-    User: p.User,
-    jerseys: p.jerseys,
-    strava_activity_id: p.strava_activity_id,
-    segment_effort: p.segment_efforts?.at(0) || null,
-  }))
+  return {
+    race_type: race?.ScheduledRace.race_type,
+    participants: res.map((p) => ({
+      User: p.User,
+      jerseys: p.jerseys,
+      strava_activity_id: p.strava_activity_id,
+      segment_effort: p.segment_efforts?.at(0) || null,
+    })),
+  }
 }
 
 export const getResultInfoForRace = async (raceId: number) => {
