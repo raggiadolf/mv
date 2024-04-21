@@ -50,6 +50,7 @@ export default function RaceInfo({
         kom_rank?: number
       }[]
     }
+    race_type: "RACE" | "GROUPRIDE"
   }>({
     queryKey: ["race", id],
     queryFn: () => getRaceInfo(id),
@@ -67,6 +68,8 @@ export default function RaceInfo({
   const kom_rank = raceInfo?.firstFinisher?.segment_efforts[0].kom_rank
   const segment_id =
     raceInfo?.firstFinisher?.segment_efforts[0].strava_segment_id
+
+  const isRace = raceInfo?.race_type === "RACE"
 
   return (
     <div>
@@ -95,7 +98,7 @@ export default function RaceInfo({
               <div className="flex items-center">
                 <ClockIcon className="w-4 h-4 mr-2" />
                 <span className="text-sm font-extralight">
-                  {formatElapsedTime(finishingTime)}
+                  {isRace ? formatElapsedTime(finishingTime) : "☕️"}
                 </span>
                 {kom_rank && (
                   <a
@@ -111,7 +114,9 @@ export default function RaceInfo({
               </div>
               <div className="flex items-center col-span-2">
                 <ForwardArrow className="w-4 h-4 mr-2" />
-                <span className="text-sm font-extralight">{`${finishingSpeed} km/klst`}</span>
+                <span className="text-sm font-extralight">
+                  {isRace ? `${finishingSpeed} km/klst` : "💆"}
+                </span>
               </div>
             </div>
           </div>

@@ -557,6 +557,9 @@ export const getResultInfoForRace = async (raceId: number) => {
     where: {
       id: raceId,
     },
+    include: {
+      ScheduledRace: true,
+    },
   })
   if (!race) return null // TODO: Throw error and handle gracefully
   const participants = await prisma.participant.findMany({
@@ -588,6 +591,7 @@ export const getResultInfoForRace = async (raceId: number) => {
     totalNoOfUsers,
     firstFinisher,
     fastestSegment,
+    race_type: race.ScheduledRace.race_type,
   }
 }
 
@@ -1051,6 +1055,7 @@ const getParticipant = async (user: User, race: RaceWithScheduledRace) => {
       (effort) => effort.jersey === "YELLOW"
     )?.strava_segment_id
     if (
+      race.ScheduledRace.race_type !== "RACE" ||
       activity.segment_efforts.some(
         (se: any) => se.segment.id === yellowJerseySegmentId
       )
