@@ -14,7 +14,6 @@ async function getResults(jersey: string, season: string | null) {
 
 export default function Leaderboard() {
   const searchParams = useSearchParams()
-  console.log("searchParams", searchParams)
   const [selectedTab, setSelectedTab] = useState<React.Key | null>(null)
   const tabs = Object.values(Jersey)
 
