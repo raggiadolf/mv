@@ -676,8 +676,6 @@ export const getOverAllResults = async (season: string) => {
         : {}),
     },
   })
-  console.log("season", season)
-  console.log("numberOfRaces", numberOfRaces)
 
   return res.map((p: any) => ({
     id: p.id,
