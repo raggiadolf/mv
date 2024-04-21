@@ -637,7 +637,9 @@ export const getNumberOfJerseysForUser = async (jersey: Jersey) => {
   })
 }
 
-export const getOverAllResults = async () => {
+export const getOverAllResults = async (season: string) => {
+  const yearFrom = `${season}-01-01`
+  const yearTo = `${season}-12-31`
   const res: any[] = await prisma.$queryRaw`
     SELECT
       u.id,
@@ -654,11 +656,28 @@ export const getOverAllResults = async () => {
     FROM
       "User" u
       JOIN "Participant" p on u.id = p.user_id
+      JOIN "Race" r on p.race_id = r.id
+    WHERE
+      ${season} = '' OR
+      r.date >= ${yearFrom}::date AND r.date <= ${yearTo}::date
     GROUP BY
       u.id, u.profile, u.firstname, u.lastname, u.strava_id
   `
 
-  const numberOfRaces = await prisma.race.count()
+  const numberOfRaces = await prisma.race.count({
+    where: {
+      ...(season
+        ? {
+            date: {
+              gte: new Date(`${season}-01-01`),
+              lte: new Date(`${season}-12-31`),
+            },
+          }
+        : {}),
+    },
+  })
+  console.log("season", season)
+  console.log("numberOfRaces", numberOfRaces)
 
   return res.map((p: any) => ({
     id: p.id,

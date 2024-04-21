@@ -4,12 +4,17 @@ import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Jersey } from "@prisma/client"
 import NewTabs from "./NewTabs"
+import { useSearchParams } from "next/navigation"
 
-async function getResults(jersey: string) {
-  return await fetch(`/results?jersey=${jersey}`).then((res) => res.json())
+async function getResults(jersey: string, season: string | null) {
+  return await fetch(`/results?jersey=${jersey}&season=${season}`).then((res) =>
+    res.json()
+  )
 }
 
 export default function Leaderboard() {
+  const searchParams = useSearchParams()
+  console.log("searchParams", searchParams)
   const [selectedTab, setSelectedTab] = useState<React.Key | null>(null)
   const tabs = Object.values(Jersey)
 
@@ -28,8 +33,9 @@ export default function Leaderboard() {
       part_percentage: number
     }[]
   >({
-    queryKey: ["results", selectedTab],
-    queryFn: () => getResults(selectedTab as string),
+    queryKey: ["results", selectedTab, searchParams.get("season")],
+    queryFn: () =>
+      getResults(selectedTab as string, searchParams.get("season")),
   })
 
   return (
