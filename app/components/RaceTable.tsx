@@ -162,14 +162,15 @@ export default function RaceTable({ race }: { race: RaceWithParticipants }) {
                             : "☕️"}
                         </a>
                         <p className="text-xs font-light">
-                          {isRace &&
-                            `${(
-                              (p.segment_effort?.distance_in_meters /
-                                p.segment_effort?.elapsed_time_in_seconds) *
-                              (18 / 5)
-                            )
-                              .toFixed(1)
-                              .replace(".", ",")} km/klst`}
+                          {isRace && p.segment_effort
+                            ? `${(
+                                (p.segment_effort?.distance_in_meters /
+                                  p.segment_effort?.elapsed_time_in_seconds) *
+                                (18 / 5)
+                              )
+                                .toFixed(1)
+                                .replace(".", ",")} km/klst`
+                            : `-`}
                         </p>
                       </div>
                     </TableCell>
