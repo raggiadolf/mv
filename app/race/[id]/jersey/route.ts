@@ -28,7 +28,7 @@ export async function POST(
   const participantId = parseInt(body.participantId)
   const raceId = parseInt(params.id)
 
-  await addJerseyToParticipant(participantId, jersey)
+  await addJerseyToParticipant(participantId, jersey, true)
 
   return new Response(JSON.stringify({}), { status: 200 })
 }

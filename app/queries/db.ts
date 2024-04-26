@@ -829,7 +829,8 @@ export const calculateJerseysForRace = async (raceId: number) => {
 
 export const addJerseyToParticipant = async (
   participantId: number,
-  jersey: Jersey
+  jersey: Jersey,
+  admin = false
 ) => {
   const participantJerseys = await prisma.participant.findUnique({
     where: {
@@ -837,6 +838,7 @@ export const addJerseyToParticipant = async (
     },
     select: {
       jerseys: true,
+      jerseys_set_by_admin: true,
       race_id: true,
     },
   })
@@ -849,9 +851,21 @@ export const addJerseyToParticipant = async (
     return null
   }
 
-  await removeJerseyFromRace(participantJerseys?.race_id, jersey)
+  await removeJerseyFromRace(participantJerseys?.race_id, jersey, admin)
 
-  return await prisma.participant.update({
+  let queryUpdate: {
+    where: {
+      id: number
+    }
+    data: {
+      jerseys: {
+        push: Jersey
+      }
+      jerseys_set_by_admin?: {
+        push: Jersey
+      }
+    }
+  } = {
     where: {
       id: participantId,
     },
@@ -860,7 +874,18 @@ export const addJerseyToParticipant = async (
         push: jersey,
       },
     },
-  })
+  }
+
+  if (admin) {
+    queryUpdate.data = {
+      ...queryUpdate.data,
+      jerseys_set_by_admin: {
+        push: jersey,
+      },
+    }
+  }
+
+  return await prisma.participant.update(queryUpdate)
 }
 
 export const removeJerseyFromParticipant = async (
@@ -892,7 +917,11 @@ export const removeJerseyFromParticipant = async (
   })
 }
 
-export const removeJerseyFromRace = async (raceId: number, jersey: Jersey) => {
+export const removeJerseyFromRace = async (
+  raceId: number,
+  jersey: Jersey,
+  admin = false
+) => {
   const participants = await prisma.participant.findMany({
     where: {
       race_id: raceId,
@@ -900,11 +929,25 @@ export const removeJerseyFromRace = async (raceId: number, jersey: Jersey) => {
     select: {
       id: true,
       jerseys: true,
+      jerseys_set_by_admin: true,
     },
   })
 
   for (const participant of participants) {
-    if (participant.jerseys.includes(jersey)) {
+    if (
+      participant.jerseys.includes(jersey) &&
+      (!participant.jerseys_set_by_admin.includes(jersey) || admin)
+    ) {
+      console.log("removing", jersey)
+      console.log(
+        "participant.jerseys.includes(jersey)",
+        participant.jerseys.includes(jersey)
+      )
+      console.log(
+        "!participant.jerseys_set_by_admin.includes(jersey)",
+        !participant.jerseys_set_by_admin.includes(jersey)
+      )
+      console.log("admin", admin)
       await prisma.participant.update({
         where: {
           id: participant.id,
