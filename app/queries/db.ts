@@ -166,6 +166,9 @@ export const findRaceOnDate = async (date: Date) => {
         lte: new Date(`${date.toISOString().split("T")[0]}T23:59:59`),
       },
     },
+    include: {
+      ScheduledRace: true,
+    },
   })
 }
 
@@ -174,6 +177,9 @@ export const createDefaultMVRace = async (date: Date) => {
     data: {
       date: new Date(`${date.toISOString().split("T")[0]}T06:10:00`),
       scheduled_race_id: 1,
+    },
+    include: {
+      ScheduledRace: true,
     },
   })
 }

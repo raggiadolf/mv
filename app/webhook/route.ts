@@ -38,12 +38,23 @@ export async function POST(req: Request): Promise<NextResponse> {
 
       const raceSegments = await getRaceSegments(activity, scheduledRace, user)
       try {
-        await createParticipantFromStrava(
-          user.id,
-          race.id,
-          raceSegments,
-          activity.id
-        )
+        if (
+          race.ScheduledRace.race_type === "GROUPRIDE" ||
+          (race.ScheduledRace.race_type === "RACE" &&
+            raceSegments.some((rs) => rs.jersey === "YELLOW"))
+        ) {
+          await createParticipantFromStrava(
+            user.id,
+            race.id,
+            raceSegments,
+            activity.id
+          )
+        } else {
+          console.info(
+            `Ride is a race and does not include yellow jersey segment, skipping for ${user.id} in ${race.id}`
+          )
+          console.info(race)
+        }
       } catch (e) {
         console.error("Error creating participant", e)
         return NextResponse.json({ received: true })
