@@ -842,16 +842,29 @@ export const addJerseyToParticipant = async (
       race_id: true,
     },
   })
+  console.log("participantJerseys", participantJerseys)
   if (participantJerseys?.jerseys.includes(jersey)) {
     // throw error?
+    console.log("here?")
     return participantJerseys
   }
   if (!participantJerseys) {
+    console.log("no here?")
     // throw error
     return null
   }
 
-  await removeJerseyFromRace(participantJerseys?.race_id, jersey, admin)
+  if (admin || !participantJerseys.jerseys_set_by_admin.includes(jersey)) {
+    console.log("removing?")
+    console.log("admin", admin)
+    console.log(
+      "participantJerseys.jerseys_set_by_admin",
+      participantJerseys.jerseys_set_by_admin
+    )
+    await removeJerseyFromRace(participantJerseys?.race_id, jersey, admin)
+  } else {
+    console.log("not removing because admin")
+  }
 
   let queryUpdate: {
     where: {
@@ -876,7 +889,7 @@ export const addJerseyToParticipant = async (
     },
   }
 
-  if (admin) {
+  if (admin && !participantJerseys.jerseys_set_by_admin.includes(jersey)) {
     queryUpdate.data = {
       ...queryUpdate.data,
       jerseys_set_by_admin: {
@@ -934,26 +947,16 @@ export const removeJerseyFromRace = async (
   })
 
   for (const participant of participants) {
-    if (
-      participant.jerseys.includes(jersey) &&
-      (!participant.jerseys_set_by_admin.includes(jersey) || admin)
-    ) {
-      console.log("removing", jersey)
-      console.log(
-        "participant.jerseys.includes(jersey)",
-        participant.jerseys.includes(jersey)
-      )
-      console.log(
-        "!participant.jerseys_set_by_admin.includes(jersey)",
-        !participant.jerseys_set_by_admin.includes(jersey)
-      )
-      console.log("admin", admin)
+    if (participant.jerseys.includes(jersey)) {
       await prisma.participant.update({
         where: {
           id: participant.id,
         },
         data: {
           jerseys: {
+            set: participant.jerseys.filter((j) => j !== jersey),
+          },
+          jerseys_set_by_admin: {
             set: participant.jerseys.filter((j) => j !== jersey),
           },
         },
