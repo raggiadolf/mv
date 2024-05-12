@@ -38,8 +38,12 @@ export async function POST(req: Request): Promise<NextResponse> {
 
       const raceSegments = await getRaceSegments(activity, scheduledRace, user)
       try {
+        // TODO: Make these segment checks more dynamic
         if (
-          race.ScheduledRace.race_type === "GROUPRIDE" ||
+          (race.ScheduledRace.race_type === "GROUPRIDE" &&
+            activity.segment_efforts.some(
+              (se: any) => se.segment.id === 15536980
+            )) ||
           (race.ScheduledRace.race_type === "RACE" &&
             raceSegments.some((rs) => rs.jersey === "YELLOW"))
         ) {

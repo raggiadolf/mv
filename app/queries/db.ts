@@ -1099,10 +1099,14 @@ const getParticipant = async (user: User, race: RaceWithScheduledRace) => {
       (effort) => effort.jersey === "YELLOW"
     )?.strava_segment_id
     if (
-      race.ScheduledRace.race_type !== "RACE" ||
-      activity.segment_efforts.some(
-        (se: any) => se.segment.id === yellowJerseySegmentId
-      )
+      (race.ScheduledRace.race_type === "GROUPRIDE" &&
+        activity.segment_efforts.some(
+          (se: any) => se.segment.id === 15536980
+        )) ||
+      (race.ScheduledRace.race_type !== "RACE" &&
+        activity.segment_efforts.some(
+          (se: any) => se.segment.id === yellowJerseySegmentId
+        ))
     ) {
       return {
         user_id: user.id,
