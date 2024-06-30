@@ -172,11 +172,14 @@ export const findRaceOnDate = async (date: Date) => {
   })
 }
 
-export const createDefaultMVRace = async (date: Date) => {
+export const createDefaultMVRace = async (
+  date: Date,
+  scheduledRaceId: number
+) => {
   return await prisma.race.create({
     data: {
       date: new Date(`${date.toISOString().split("T")[0]}T06:10:00`),
-      scheduled_race_id: 1,
+      scheduled_race_id: scheduledRaceId,
     },
     include: {
       ScheduledRace: true,

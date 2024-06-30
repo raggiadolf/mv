@@ -33,7 +33,10 @@ export async function POST(req: Request): Promise<NextResponse> {
       let race = await findRaceOnDate(new Date(activity.start_date_local))
       if (!race) {
         // Create if not available?
-        race = await createDefaultMVRace(new Date(activity.start_date_local))
+        race = await createDefaultMVRace(
+          new Date(activity.start_date_local),
+          scheduledRace.id
+        )
       }
 
       const raceSegments = await getRaceSegments(activity, scheduledRace, user)
