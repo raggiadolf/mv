@@ -90,6 +90,10 @@ export const getRaceSegments = async (
       (se: any) => se.segment.id === Number(rs.strava_segment_id)
     )
     console.log("checking rs", rs, "for user", user)
+    console.log("found?", scheduledRaceSegment)
+    if (!scheduledRaceSegment) {
+      console.log("activity.segment_efforts", activity.segment_efforts)
+    }
     if (scheduledRaceSegment) {
       if (
         (user.eligible_for_old && rs.jersey === "OLD") ||
