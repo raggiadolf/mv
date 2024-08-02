@@ -89,6 +89,7 @@ export const getRaceSegments = async (
     const scheduledRaceSegment = activity.segment_efforts.find(
       (se: any) => se.segment.id === Number(rs.strava_segment_id)
     )
+    console.log("checking rs", rs, "for user", user)
     if (scheduledRaceSegment) {
       if (
         (user.eligible_for_old && rs.jersey === "OLD") ||
@@ -97,6 +98,7 @@ export const getRaceSegments = async (
         rs.jersey === "GREEN" ||
         rs.jersey === "POLKA"
       ) {
+        console.log("found segment", scheduledRaceSegment)
         res.push({
           strava_segment_id: Number(rs.strava_segment_id),
           elapsed_time_in_seconds: scheduledRaceSegment.elapsed_time,

@@ -1093,6 +1093,7 @@ const getParticipant = async (user: User, race: RaceWithScheduledRace) => {
   for (const pra of possibleRaceActivities) {
     const activity = await getStravaActivity(pra.id, tokens.accessToken)
     console.log(`Checking activity ${activity.id}`)
+    console.log("race", race.ScheduledRace)
     const raceSegmentEfforts = await getRaceSegments(
       activity,
       race.ScheduledRace,
