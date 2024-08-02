@@ -1108,7 +1108,7 @@ const getParticipant = async (user: User, race: RaceWithScheduledRace) => {
         activity.segment_efforts.some(
           (se: any) => se.segment.id === 15536980
         )) ||
-      (race.ScheduledRace.race_type !== "RACE" &&
+      (race.ScheduledRace.race_type === "RACE" &&
         activity.segment_efforts.some(
           (se: any) => se.segment.id === yellowJerseySegmentId
         ))
@@ -1138,7 +1138,7 @@ const getParticipant = async (user: User, race: RaceWithScheduledRace) => {
       )
       console.log(
         "RACE",
-        race.ScheduledRace.race_type !== "RACE" &&
+        race.ScheduledRace.race_type === "RACE" &&
           activity.segment_effort.some(
             (se: any) => se.segment_id === yellowJerseySegmentId
           )
