@@ -1093,15 +1093,16 @@ const getParticipant = async (user: User, race: RaceWithScheduledRace) => {
   for (const pra of possibleRaceActivities) {
     const activity = await getStravaActivity(pra.id, tokens.accessToken)
     console.log(`Checking activity ${activity.id}`)
-    console.log("race", race.ScheduledRace)
     const raceSegmentEfforts = await getRaceSegments(
       activity,
       race.ScheduledRace,
       user
     )
+    console.log("raceSegmentEfforts", raceSegmentEfforts)
     const yellowJerseySegmentId = raceSegmentEfforts.find(
       (effort) => effort.jersey === "YELLOW"
     )?.strava_segment_id
+    console.log("yellowJerseySegmentId", yellowJerseySegmentId)
     if (
       (race.ScheduledRace.race_type === "GROUPRIDE" &&
         activity.segment_efforts.some(
@@ -1128,6 +1129,20 @@ const getParticipant = async (user: User, race: RaceWithScheduledRace) => {
           race_segment_id: effort.race_segment_id,
         })),
       }
+    } else {
+      console.log("not returning")
+      console.log(
+        "GROUP_RIDE",
+        race.ScheduledRace.race_type === "GROUPRIDE" &&
+          activity.segment_effort.some((se: any) => se.segment_id === 15536980)
+      )
+      console.log(
+        "RACE",
+        race.ScheduledRace.race_type !== "RACE" &&
+          activity.segment_effort.some(
+            (se: any) => se.segment_id === yellowJerseySegmentId
+          )
+      )
     }
   }
 }
