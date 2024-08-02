@@ -1098,11 +1098,9 @@ const getParticipant = async (user: User, race: RaceWithScheduledRace) => {
       race.ScheduledRace,
       user
     )
-    console.log("raceSegmentEfforts", raceSegmentEfforts)
     const yellowJerseySegmentId = raceSegmentEfforts.find(
       (effort) => effort.jersey === "YELLOW"
     )?.strava_segment_id
-    console.log("yellowJerseySegmentId", yellowJerseySegmentId)
     if (
       (race.ScheduledRace.race_type === "GROUPRIDE" &&
         activity.segment_efforts.some(
